@@ -23,8 +23,8 @@ const Sidebar = () => {
             <CustomNavLink to={'/messages'}><HiOutlineEnvelope />Messages</CustomNavLink>
             <CustomNavLink to={'/lists'}><RiFileListLine />Lists</CustomNavLink>
             <CustomNavLink to={'/bookmarks'}><RiBookmarkLine />Bookmarks</CustomNavLink>
-            <CustomNavLink to={'/profile'}><FaRegUser />Profile</CustomNavLink>
-            <CustomNavLink to={'/more'}><HiOutlineDotsCircleHorizontal />More</CustomNavLink>
+            <CustomNavLink active to={'/profile'}><FaRegUser />Profile</CustomNavLink>
+            <CustomNavLink active to={'/more'}><HiOutlineDotsCircleHorizontal />More</CustomNavLink>
             <div className='tweet-button-container text-center p-4'>
                 <button className='bg-[--twitter-color] w-full py-2 px-4 rounded-full text-xl text-white font-semibold hover:bg-sky-600'>Tweet</button>
             </div>
