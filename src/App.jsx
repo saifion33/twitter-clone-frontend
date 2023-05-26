@@ -11,25 +11,29 @@ import Bookmarks from './components/feed/Bookmarks'
 import More from './components/feed/More'
 import { Routes, Route } from 'react-router-dom'
 import Profile from './components/feed/Profile'
+import AuthFooterBar from './components/AuthFooterBar'
 function App() {
 
   return (
-    <div className='app flex'>
-      <Sidebar />
-      <Routes>
-        <Route path='/' element={<Feed />} >
-          <Route path='/' element={<Home />} />
-          <Route path='/explore' element={<Explore />} />
-          <Route path='/notifications' element={<Notifications />} />
-          <Route path='/messages' element={<Messages />} />
-          <Route path='/lists' element={<Lists />} />
-          <Route path='/bookmarks' element={<Bookmarks />} />
-          <Route path='/profile' element={<Profile />} />
-          <Route path='/more' element={<More />} />
-        </Route>
-      </Routes>
-      <WidgetBar />
-    </div>
+    <>
+      <div className='app flex'>
+        <Sidebar />
+        <Routes>
+          <Route path='/' element={<Feed />} >
+            <Route path='/' element={<Home />} />
+            <Route path='/explore' element={<Explore />} />
+            <Route path='/notifications' element={<Notifications />} />
+            <Route path='/messages' element={<Messages />} />
+            <Route path='/lists' element={<Lists />} />
+            <Route path='/bookmarks' element={<Bookmarks />} />
+            <Route path='/profile' element={<Profile />} />
+            <Route path='/more' element={<More />} />
+          </Route>
+        </Routes>
+        <WidgetBar />
+      </div>
+      <AuthFooterBar />
+    </>
   )
 }
 
