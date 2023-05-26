@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root{
+    --twitter-color:#1d9bf0
+}
