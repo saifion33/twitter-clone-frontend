@@ -15,8 +15,8 @@ const AuthFooterBar = () => {
                 <p>People on Twitter are the first to know.</p>
             </div>
             <div className='flex  gap-6 mx-auto'>
-                <button className='border-[1px] rounded-full py-2 px-5 text-white font-semibold' onClick={() => { setIsLogin(!isLogin); openModal() }} >Log in</button>
-                <button className='bg-white rounded-full py-2 px-5 font-semibold' onClick={() => { setIsLogin(!isLogin); openModal() }}>Sign up</button>
+                <button className='border-[1px] rounded-full py-2 px-5 text-white font-semibold' onClick={() => { setIsLogin(false); openModal() }} >Log in</button>
+                <button className='bg-white rounded-full py-2 px-5 font-semibold' onClick={() => { setIsLogin(true); openModal() }}>Sign up</button>
             </div>
             <Modal isOpen={isOpen} onClose={closeModal}>
                 {

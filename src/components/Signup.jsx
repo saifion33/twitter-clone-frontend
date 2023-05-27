@@ -4,18 +4,22 @@ import { FcGoogle } from 'react-icons/fc'
 
 const Signup = () => {
     return (
-        <div className='flex justify-center flex-col items-center'>
+        <div className='flex justify-center flex-col items-center px-24'>
             <h1 className='text-3xl font-bold my-5'>Join Twitter today</h1>
             <div className='px-10 space-y-3'>
-                <button className='flex items-center bg-white py-1 px-8 rounded-full border-[1px] w-full gap-2 my-4'><FcGoogle /> Sign in with Google</button>
-                <button className='flex items-center bg-white py-1 px-8 rounded-full border-[1px] w-full gap-2 my-4'><AiFillApple /> Sign in with Apple</button>
+                <button className='flex items-center bg-white hover:bg-gray-200 py-1 px-8 rounded-full border-[1px] w-full gap-2 my-4'><FcGoogle /> Sign in with Google</button>
+                <button className='flex items-center bg-white hover:bg-gray-200 py-1 px-8 rounded-full border-[1px] w-full gap-2 my-4'><AiFillApple /> Sign in with Apple</button>
                 <div className='flex items-center justify-center gap-2 w-full'>
                     <span className=' w-full h-[1px] bg-gray-400'></span>
                     <p>or</p>
                     <span className=' w-full h-[1px] bg-gray-400'></span>
                 </div>
+                <button className='bg-slate-950 hover:bg-slate-800 py-2 rounded-full w-full text-stone-200 text-base font-semibold'>Create account</button>
+                <p className='text-xs text-gray-600 mt-2'>
+                    By signing up, you agree to the <span className='text-blue-600'>Terms of Service</span> and <span className='text-blue-600'>Privacy Policy</span>, including <span className='text-blue-600'>Cookie Use.</span>
+                </p>
                 <div className='py-2'>
-                    <p className='text-sm text-gray-700'>Don&apos;t have an account? <span className='text-[--twitter-color] cursor-pointer'>Sign up</span></p>
+                    <p className='text-sm text-gray-700'>Don&apos;t have an account? <span className='text-[--twitter-color] cursor-pointer'>Log in</span></p>
                 </div>
             </div>
         </div>

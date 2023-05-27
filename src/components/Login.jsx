@@ -16,7 +16,7 @@ const Login = () => {
                 </div>
                 <div className='flex flex-col gap-6'>
                     <input type="text" className='border-[1px] p-4 rounded-sm text-gray-600 ' value={'Phone, email or username'} />
-                    <button className='bg-slate-950 hover:bg-slate-900 py-2 rounded-full text-stone-200 text-base font-semibold '>Next</button>
+                    <button className='bg-slate-950 hover:bg-slate-900 py-2 rounded-full text-stone-200 text-base font-semibold'>Next</button>
                     <button className='bg-white hover:bg-gray-100 border-[1px] py-2 rounded-full text-slate-800 text-base font-semibold '>Forgot Password?</button>
                 </div>
                 <div className='py-2'>
