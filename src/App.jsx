@@ -32,7 +32,7 @@ function App() {
         </Routes>
         <WidgetBar />
       </div>
-      <AuthFooterBar />
+      {/* <AuthFooterBar /> */}
     </>
   )
 }

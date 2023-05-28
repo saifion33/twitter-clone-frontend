@@ -1,8 +1,10 @@
 import React from 'react'
+import TweetCard from '../Tweet/TweetCard'
 const Home = () => {
   return (
     <div>
-      Home
+      <TweetCard />
+      <TweetCard />
     </div>
   )
 }

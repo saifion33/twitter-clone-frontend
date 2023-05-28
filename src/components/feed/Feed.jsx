@@ -2,8 +2,8 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 const Feed = () => {
     return (
-        <div className='w-1/2 flex items-center justify-center text-4xl font-bold text-[--twitter-color] border-x-[1px]'>
-            <p>Welcome to_</p> <Outlet />
+        <div className='w-1/2  border-x-[1px] h-screen overflow-y-auto scrollbar-hide'>
+            <Outlet />
         </div>
     )
 }
