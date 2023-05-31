@@ -8,8 +8,9 @@ import Signup from './Signup'
 const AuthFooterBar = () => {
     const { isOpen, openModal, closeModal } = useModal()
     const [isLogin, setIsLogin] = useState(false)
+    
     return (
-        <div className='absolute bottom-0 left-0 bg-[--twitter-color] w-full flex justify-evenly items-center py-2'>
+        <div className='absolute bottom-0 left-0 bg-twitter-100 w-full flex justify-evenly items-center py-2'>
             <div className='mx-auto text-white'>
                 <h1 className='text-2xl font-bold'>Don&apos;t miss what&apos;s happning</h1>
                 <p>People on Twitter are the first to know.</p>

@@ -12,16 +12,24 @@ import More from './components/feed/More'
 import { Routes, Route } from 'react-router-dom'
 import Profile from './components/feed/Profile'
 import AuthFooterBar from './components/AuthFooterBar'
+import { useAuthState, useSignOut } from 'react-firebase-hooks/auth'
+import { auth } from './firebase/firebase'
+import Setting from './components/feed/Setting'
+
+
 function App() {
+  const [user] = useAuthState(auth)
 
   return (
     <>
       <div className='app flex'>
+
         <Sidebar />
         <Routes>
           <Route path='/' element={<Feed />} >
             <Route path='/' element={<Home />} />
             <Route path='/explore' element={<Explore />} />
+            <Route path='/setting' element={<Setting />} />
             <Route path='/notifications' element={<Notifications />} />
             <Route path='/messages' element={<Messages />} />
             <Route path='/lists' element={<Lists />} />
@@ -32,7 +40,9 @@ function App() {
         </Routes>
         <WidgetBar />
       </div>
-      {/* <AuthFooterBar /> */}
+      {
+        !user && <AuthFooterBar />
+      }
     </>
   )
 }

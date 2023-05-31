@@ -7,36 +7,59 @@ import { HiOutlineEnvelope, } from 'react-icons/hi2'
 import { RiFileListLine, RiBookmarkLine } from 'react-icons/ri'
 
 import CustomNavLink from '../CustomNavLink'
+import { useAuthState, useSignOut } from 'react-firebase-hooks/auth'
+import { auth } from '../../firebase/firebase'
+import { AiOutlineSetting } from 'react-icons/ai'
+import SmallModal from '../Modal/SmallModal'
+import { useModal } from '../../utils/customHooks'
+
+
 const Sidebar = () => {
-    const user = {
-        name: 'Raja',
-        id: 'raja456'
-    }
+    const [signOut] = useSignOut(auth)
+    const [user, loading, error] = useAuthState(auth)
+    const { isOpen, openModal, closeModal } = useModal()
     return (
         <div className='sidebar py-4 pl-24 pr-3 w-1/4 space-y-1 overflow-y-scroll max-h-screen'>
             <div className='p-4'>
-                <FaTwitter className='text-[--twitter-color] text-3xl cursor-pointer' />
+                <FaTwitter className='text-twitter-100 text-3xl cursor-pointer' />
             </div>
-            <CustomNavLink active to={'/'}><BiHomeCircle />Home</CustomNavLink>
+            {(user && !loading) && <CustomNavLink active to={'/'}><BiHomeCircle />Home</CustomNavLink>}
             <CustomNavLink to={'/explore'}><FaHashtag />Expore</CustomNavLink>
-            <CustomNavLink to={'/notifications'}><IoNotificationsOutline />Notifications</CustomNavLink>
-            <CustomNavLink to={'/messages'}><HiOutlineEnvelope />Messages</CustomNavLink>
-            <CustomNavLink to={'/lists'}><RiFileListLine />Lists</CustomNavLink>
-            <CustomNavLink to={'/bookmarks'}><RiBookmarkLine />Bookmarks</CustomNavLink>
-            <CustomNavLink active to={'/profile'}><FaRegUser />Profile</CustomNavLink>
-            <CustomNavLink active to={'/more'}><HiOutlineDotsCircleHorizontal />More</CustomNavLink>
-            <div className='tweet-button-container text-center p-4'>
-                <button className='bg-[--twitter-color] w-full py-2 px-4 rounded-full text-xl text-white font-semibold hover:bg-sky-600'>Tweet</button>
-            </div>
-            <div role='button' className='user-profile-button-container flex items-center rounded-full hover:bg-gray-200 p-3 justify-between cursor-pointer'>
-                <FaUser className='text-4xl text-[#657786] bg-gray-300 rounded-full p-1' />
-                <div className='pl-3'>
-                    <p>{user.name}</p>
-                    <p className='text-slate-600'>@{user.id}</p>
+            {(!user && !loading) && <CustomNavLink to={'/setting'} ><AiOutlineSetting />Setting</CustomNavLink>}
+            {(user && !loading) && <div className='space-y-1'>
+
+                <CustomNavLink to={'/notifications'}><IoNotificationsOutline />Notifications</CustomNavLink>
+                <CustomNavLink to={'/messages'}><HiOutlineEnvelope />Messages</CustomNavLink>
+                <CustomNavLink to={'/lists'}><RiFileListLine />Lists</CustomNavLink>
+                <CustomNavLink to={'/bookmarks'}><RiBookmarkLine />Bookmarks</CustomNavLink>
+                <CustomNavLink active to={'/profile'}><FaRegUser />Profile</CustomNavLink>
+                <CustomNavLink active to={'/more'}><HiOutlineDotsCircleHorizontal />More</CustomNavLink></div>}
+            {
+                (user && !loading) && <div className='tweet-button-container text-center p-4'>
+                    <button className='bg-twitter-100 w-full py-2 px-4 rounded-full text-xl text-white font-semibold hover:bg-sky-600'>Tweet</button>
                 </div>
-                <HiDotsHorizontal className='text-2xl ml-auto' />
-            </div>
-        </div>
+            }
+            {
+                (user && !loading) && <div role='button' className='user-profile-button-container relative flex items-center rounded-full hover:bg-gray-200 p-3 justify-between cursor-pointer'>
+                    <img className='w-8 rounded-full' src={user?.photoURL} alt={user?.displayName} />
+                    <div className='pl-3'>
+                        <p>{user?.displayName}</p>
+                        <p className='text-slate-600'>@{user?.id}</p>
+                    </div>
+                    <HiDotsHorizontal className='text-2xl ml-auto' onClick={openModal} />
+                    <SmallModal isOpen={isOpen} onClose={closeModal} >
+                        <div className='text-base p-4'>
+                            <button onClick={() => { signOut(); closeModal() }} className='bg-twitter-100 rounded-full text-white py-1 px-3 hover:bg-twitter-75 '>logOut {user?.displayName}</button>
+                        </div>
+                    </SmallModal>
+                </div>
+            }
+            {
+                (!loading && error) && <div>
+                    {error.message}
+                </div>
+            }
+        </div >
     )
 }
 

@@ -24,7 +24,7 @@ const TweetCard = () => {
                     <BsThreeDots />
                 </div>
             </header>
-            <div className='pl-8'>
+            <div className='pl-12 py-4'>
                 Lorem ipsum dolor sit amet.
             </div>
             <div className='flex justify-center items-center'>
