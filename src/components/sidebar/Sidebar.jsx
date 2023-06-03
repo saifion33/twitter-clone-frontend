@@ -1,17 +1,18 @@
 import React from 'react'
-import { BiHomeCircle } from 'react-icons/bi'
-import { FaHashtag, FaRegUser, FaTwitter, FaUser } from 'react-icons/fa'
-import { IoNotificationsOutline } from 'react-icons/io5'
-import { HiOutlineDotsCircleHorizontal, HiDotsHorizontal } from 'react-icons/hi'
-import { HiOutlineEnvelope, } from 'react-icons/hi2'
-import { RiFileListLine, RiBookmarkLine } from 'react-icons/ri'
 
-import CustomNavLink from '../CustomNavLink'
+import { HiOutlineDotsCircleHorizontal, HiDotsHorizontal } from 'react-icons/hi'
 import { useAuthState, useSignOut } from 'react-firebase-hooks/auth'
-import { auth } from '../../firebase/firebase'
-import { AiOutlineSetting } from 'react-icons/ai'
-import SmallModal from '../Modal/SmallModal'
+import { FaHashtag, FaRegUser, FaTwitter } from 'react-icons/fa'
+import { RiFileListLine, RiBookmarkLine } from 'react-icons/ri'
+import { IoNotificationsOutline } from 'react-icons/io5'
+import { HiOutlineEnvelope, } from 'react-icons/hi2'
 import { useModal } from '../../utils/customHooks'
+import { AiOutlineSetting } from 'react-icons/ai'
+import { auth } from '../../firebase/firebase'
+import { BiHomeCircle } from 'react-icons/bi'
+import CustomNavLink from '../CustomNavLink'
+import SmallModal from '../Modal/SmallModal'
+
 
 
 const Sidebar = () => {

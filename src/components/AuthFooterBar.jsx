@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
-import Modal from './Modal/Modal'
+
 import { useModal } from '../utils/customHooks'
-import Login from './Login'
+import Modal from './Modal/Modal'
 import Signup from './Signup'
+import Login from './Login'
 
 
 const AuthFooterBar = () => {
     const { isOpen, openModal, closeModal } = useModal()
     const [isLogin, setIsLogin] = useState(false)
-    
+
     return (
         <div className='absolute bottom-0 left-0 bg-twitter-100 w-full flex justify-evenly items-center py-2'>
             <div className='mx-auto text-white'>

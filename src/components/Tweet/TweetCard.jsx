@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
+
+import imagePlaceholder from '../../assets/image-placeholder.svg'
 import { AiOutlineHeart, AiOutlineRetweet } from 'react-icons/ai'
 import { BiMessageRounded, BiBarChart } from 'react-icons/bi'
 import { HiArrowUpTray } from 'react-icons/hi2'
 import { BsThreeDots } from 'react-icons/bs'
 import { GoVerified } from 'react-icons/go'
 
-
 const TweetCard = () => {
+    const [imageLoaded, setImageLoaded] = useState(true)
+    const handleImageError = () => {
+        setImageLoaded(false)
+    }
+
     return (
         <div className='p-6 cursor-pointer hover:bg-gray-100'>
             <header className='flex gap-4 items-center'>
@@ -28,7 +34,11 @@ const TweetCard = () => {
                 Lorem ipsum dolor sit amet.
             </div>
             <div className='flex justify-center items-center'>
-                <img src="https://picsum.photos/600" alt="image" />
+                {imageLoaded ? (
+                    <img src="https://picsum.photos/600" onError={handleImageError} alt="Image" />
+                ) : (
+                    <img src={imagePlaceholder} alt="Placeholder image" />
+                )}
             </div>
             <footer className='p-5 px-8 flex gap-6'>
                 <div className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>

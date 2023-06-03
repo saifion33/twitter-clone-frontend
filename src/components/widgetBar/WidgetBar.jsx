@@ -1,7 +1,8 @@
 import React from 'react'
-import Signup from './Signup'
+
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth } from '../../firebase/firebase'
+import Signup from './Signup'
 
 
 const WidgetBar = () => {

@@ -1,9 +1,11 @@
 import React from 'react'
-import { FcGoogle } from 'react-icons/fc'
-import { AiFillApple } from 'react-icons/ai'
+
 import { useAuth } from '../../Context/auth.context'
+import { AiFillApple } from 'react-icons/ai'
+import { FcGoogle } from 'react-icons/fc'
+
 const Signup = () => {
-    const {SignUpWithGoogle}=useAuth()
+    const { SignUpWithGoogle } = useAuth()
     return (
         <div>
             <div className='border-[1px] rounded-xl p-4'>

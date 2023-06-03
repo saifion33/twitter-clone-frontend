@@ -1,7 +1,8 @@
 import React from 'react'
+
+import { useAuth } from '../Context/auth.context'
 import { AiFillApple } from 'react-icons/ai'
 import { FcGoogle } from 'react-icons/fc'
-import { useAuth } from '../Context/auth.context'
 
 const Login = () => {
     const { SignInWithGoogle } = useAuth()

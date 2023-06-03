@@ -1,20 +1,21 @@
 import React from 'react'
-import Sidebar from './components/sidebar/Sidebar'
+
+import Notifications from './components/feed/Notifications'
+import { useAuthState } from 'react-firebase-hooks/auth'
 import WidgetBar from './components/widgetBar/WidgetBar'
+import AuthFooterBar from './components/AuthFooterBar'
+import Bookmarks from './components/feed/Bookmarks'
+import Sidebar from './components/sidebar/Sidebar'
+import Messages from './components/feed/Messages'
+import { Routes, Route } from 'react-router-dom'
+import Setting from './components/feed/Setting'
+import Explore from './components/feed/Explore'
+import Profile from './components/feed/Profile'
+import Lists from './components/feed/Lists'
+import { auth } from './firebase/firebase'
 import Feed from './components/feed/Feed'
 import Home from './components/feed/Home'
-import Explore from './components/feed/Explore'
-import Notifications from './components/feed/Notifications'
-import Messages from './components/feed/Messages'
-import Lists from './components/feed/Lists'
-import Bookmarks from './components/feed/Bookmarks'
 import More from './components/feed/More'
-import { Routes, Route } from 'react-router-dom'
-import Profile from './components/feed/Profile'
-import AuthFooterBar from './components/AuthFooterBar'
-import { useAuthState, useSignOut } from 'react-firebase-hooks/auth'
-import { auth } from './firebase/firebase'
-import Setting from './components/feed/Setting'
 
 
 function App() {
@@ -27,15 +28,15 @@ function App() {
         <Sidebar />
         <Routes>
           <Route path='/' element={<Feed />} >
-            <Route path='/' element={<Home />} />
+            <Route path='/notifications' element={<Notifications />} />
+            <Route path='/bookmarks' element={<Bookmarks />} />
+            <Route path='/messages' element={<Messages />}/>
             <Route path='/explore' element={<Explore />} />
             <Route path='/setting' element={<Setting />} />
-            <Route path='/notifications' element={<Notifications />} />
-            <Route path='/messages' element={<Messages />} />
-            <Route path='/lists' element={<Lists />} />
-            <Route path='/bookmarks' element={<Bookmarks />} />
             <Route path='/profile' element={<Profile />} />
+            <Route path='/lists' element={<Lists />} />
             <Route path='/more' element={<More />} />
+            <Route path='/' element={<Home />} />
           </Route>
         </Routes>
         <WidgetBar />

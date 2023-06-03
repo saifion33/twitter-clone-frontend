@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
+
 import { createPortal } from 'react-dom'
 import ModalBody from './ModalBody'
 
