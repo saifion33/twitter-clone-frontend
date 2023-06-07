@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 
 import { useModal } from '../utils/customHooks'
 import Modal from './Modal/Modal'
-import Signup from './Signup'
-import Login from './Login'
+import Signup from './Signup/Signup'
+import Login from './Login/Login'
 
 
 const AuthFooterBar = () => {

@@ -1,16 +1,20 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
-const Popover = ({ position = 'top', message, delay = 500 }) => {
-    const [showPopover, setShowPopover] = useState(false)
-    useEffect(() => {
-        setTimeout(() => {
-            setShowPopover(true)
-        }, delay);
-    }, [])
+const Popover = ({ position = 'bottom', message, children }) => {
+
+    const [isHover, setIsHover] = useState(false)
+    // const handleHover = () => {
+    //     setTimeout(() => {
+    //         setIsHover(true)
+    //     }, 100);
+    // }
     return (
-        showPopover && <div className={`absolute ${position}-0 `}>
-            {message}
+        <div className='relative cursor-pointer h-fit' onMouseEnter={() => { setIsHover(true) }} onMouseLeave={() => { setIsHover(false) }} >
+            {children}
+            {
+                isHover && <div className={`absolute -${position}-10 text-xs bg-slate-900 text-white p-1 rounded-md `}>{message}</div>
+            }
         </div>
     )
 }

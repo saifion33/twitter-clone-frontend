@@ -24,13 +24,12 @@ function App() {
   return (
     <>
       <div className='app flex'>
-
         <Sidebar />
         <Routes>
           <Route path='/' element={<Feed />} >
             <Route path='/notifications' element={<Notifications />} />
             <Route path='/bookmarks' element={<Bookmarks />} />
-            <Route path='/messages' element={<Messages />}/>
+            <Route path='/messages' element={<Messages />} />
             <Route path='/explore' element={<Explore />} />
             <Route path='/setting' element={<Setting />} />
             <Route path='/profile' element={<Profile />} />

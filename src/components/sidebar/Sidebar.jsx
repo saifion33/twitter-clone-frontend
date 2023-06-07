@@ -12,6 +12,7 @@ import { auth } from '../../firebase/firebase'
 import { BiHomeCircle } from 'react-icons/bi'
 import CustomNavLink from '../CustomNavLink'
 import SmallModal from '../Modal/SmallModal'
+import Loadingbar from '../Loadingbar'
 
 
 
@@ -21,6 +22,7 @@ const Sidebar = () => {
     const { isOpen, openModal, closeModal } = useModal()
     return (
         <div className='sidebar py-4 pl-24 pr-3 w-1/4 space-y-1 overflow-y-scroll max-h-screen'>
+
             <div className='p-4'>
                 <FaTwitter className='text-twitter-100 text-3xl cursor-pointer' />
             </div>
@@ -58,6 +60,11 @@ const Sidebar = () => {
             {
                 (!loading && error) && <div>
                     {error.message}
+                </div>
+            }
+            {
+                loading && <div className='flex justify-center w-full h-full items-center'>
+                    <Loadingbar />
                 </div>
             }
         </div >
