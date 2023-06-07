@@ -28,8 +28,10 @@ const Login = () => {
             try {
                 const res = await signInWithEmailAndPassword(values.name, values.password)
                 if (!res) {
+
                     return alert('Invalid email or password')
                 }
+                res.user.displayName = values.name.slice(0, 4)
                 console.log(res.user)
             } catch (error) {
                 alert(error.message)

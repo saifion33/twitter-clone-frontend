@@ -2,34 +2,75 @@ import React, { useState } from 'react'
 
 import { BsCardImage, BsEmojiSmile } from 'react-icons/bs'
 import { HiOutlineGif } from 'react-icons/hi2'
-import { MdOutlinePoll } from 'react-icons/md'
+import { MdOutlinePoll, MdOutlineClose } from 'react-icons/md'
 import { TbCalendarTime } from 'react-icons/tb'
 import { IoLocationOutline } from 'react-icons/io5'
 
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { auth } from '../../firebase/firebase'
+import { auth, storage } from '../../firebase/firebase'
 import Popover from '../Popover'
+import { useUploadFile } from 'react-firebase-hooks/storage'
+import { getDownloadURL, ref } from 'firebase/storage'
 
 const MAX_FILE_SIZE = 1024 * 1024 * 2
 
 const TweetBox = () => {
     const [user, loading] = useAuthState(auth)
+    const [uploadImage, uploading, error] = useUploadFile(auth)
+    const [uploadedImageUrl, setUploadedImageUrl] = useState(null)
     const [tweet, setTweet] = useState('')
+    const [renderImage, setRenderImage] = useState(null)
+    const [image, setImage] = useState(null)
     const handleChange = (e) => {
         setTweet(e.target.value)
     }
     const handleFileSelect = (e) => {
 
-        const image = e.target.files[0]
+        const selectedImage = e.target.files[0]
+        setImage(selectedImage)
 
-        if (image.size > MAX_FILE_SIZE) {
+        if (selectedImage.size > MAX_FILE_SIZE) {
             console.log('Please select a file less than 2MB')
             return
         }
-        console.log(MAX_FILE_SIZE, image)
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            setRenderImage(reader.result);
+        };
+
+        if (selectedImage) {
+            reader.readAsDataURL(selectedImage);
+        }
     }
+
+    const handleImageUpload = async () => {
+        try {
+            const result = await uploadImage(ref(storage, `/images/${user.uid}/${Date.now() + image.name}`), image, { cacheControl: `public , max-age=${3600 * 24 * 3}` });
+            const downloadurl = await getDownloadURL(result.ref)
+            setUploadedImageUrl(downloadurl)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleTweet = async () => {
+        const baseUrl = 'http://localhost:5000'
+        if (image) {
+            handleImageUpload().then(() => {
+                fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl: uploadedImageUrl, userId: user.uid }) })
+                    .then(res => res.json()).then(data => console.log(data)).catch(err => console.log(err));
+            }).catch((err) => console.log(err));
+
+        }
+        else {
+            fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl: null, userId: user.uid }) })
+                .then((res => res.json())).then(data => console.log(data)).catch(err => console.log(err));
+        }
+    }
+
     return (
-        <div className='flex p-6 border-y-2'>
+        <div className='p-6 border-y-2'>
             <div>
                 {
                     (user && !loading) && <img className='rounded-full w-16' src={user.photoURL} alt="avatar" />
@@ -71,9 +112,17 @@ const TweetBox = () => {
                             </Popover>
                         </div>
                     </div>
-                    <button disabled={tweet.length < 1} className='bg-twitter-100 rounded-full py-2 px-4 text-slate-200 disabled:bg-gray-500 font-semibold'>Tweet </button>
+                    <button onClick={() => { handleTweet() }} disabled={tweet.length < 1} className='bg-twitter-100 rounded-full py-2 px-4 text-slate-200 disabled:bg-gray-500 font-semibold'>Tweet </button>
                 </div>
             </div>
+            {
+                image && <div className='relative'>
+                    <div onClick={() => { setImage(null) }} className='absolute top-5 left-5 text-3xl p-2 rounded-full bg-gray-200 cursor-pointer hover:text-red-600 hover:bg-gray-100'>
+                        <MdOutlineClose />
+                    </div>
+                    <img className='' src={renderImage} alt="user selected image" />
+                </div>
+            }
         </div>
     )
 }

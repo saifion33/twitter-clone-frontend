@@ -18,6 +18,7 @@ import Home from './components/feed/Home'
 import More from './components/feed/More'
 
 
+
 function App() {
   const [user] = useAuthState(auth)
 
@@ -43,6 +44,7 @@ function App() {
       {
         !user && <AuthFooterBar />
       }
+
     </>
   )
 }
