@@ -14,7 +14,7 @@ const Signup = () => {
     return (
         <div className='flex justify-center flex-col items-center px-24'>
             {
-               ( !isCreateAccount) && <>
+                (!isCreateAccount) && <>
                     <h1 className='text-3xl font-bold my-5'>Join Twitter today</h1>
                     <div className='px-10 space-y-3'>
                         <button onClick={handleGoogleSignup} className='flex items-center bg-white hover:bg-gray-200 py-1 px-8 rounded-full border-[1px] w-full gap-2 my-4'><FcGoogle /> Sign up with Google</button>
