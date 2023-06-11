@@ -13,18 +13,19 @@ import { useUploadFile } from 'react-firebase-hooks/storage'
 import { getDownloadURL, ref } from 'firebase/storage'
 import Loadingbar from '../Loadingbar'
 import { useAuth } from '../../Context/auth.context'
+import { useTweets } from '../../Context/tweet.context'
 
 const MAX_FILE_SIZE = 1024 * 1024 * 2
 
 const TweetBox = () => {
     const [user, loading] = useAuthState(auth)
     const [uploadImage] = useUploadFile(auth)
-    const [uploadedImageUrl, setUploadedImageUrl] = useState(null)
     const [tweet, setTweet] = useState('')
     const [tweetPosting, setTweetPosting] = useState(false)
     const [renderImage, setRenderImage] = useState(null)
     const [image, setImage] = useState(null)
     const { loggedInUser } = useAuth()
+    const { setTweets } = useTweets()
     const handleChange = (e) => {
         setTweet(e.target.value)
     }
@@ -53,32 +54,51 @@ const TweetBox = () => {
         try {
             const result = await uploadImage(ref(storage, `/images/${user.uid}/${Date.now() + image.name}`), image, { cacheControl: `public , max-age=${3600 * 24 * 3}` });
             const downloadurl = await getDownloadURL(result.ref)
-            setUploadedImageUrl(downloadurl)
+            return downloadurl
         } catch (error) {
             console.log(error)
+            return null
         }
     }
 
     const handleTweet = async () => {
         setTweetPosting(true)
         const baseUrl = 'http://localhost:5000'
-
+        const user = {
+            name: loggedInUser.user.name,
+            userName: loggedInUser.user.userName,
+            id: loggedInUser.user.id,
+            avatarUrl: loggedInUser.user.avatarUrl
+        }
         if (image) {
-            handleImageUpload().then(() => {
-                const user = {
-                    name: loggedInUser.user.name,
-                    userName: loggedInUser.user.userName,
-                    id: loggedInUser.user.id,
-                    avatarUrl: loggedInUser.user.avatarUrl
-                }
-                fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl: uploadedImageUrl, user }) })
-                    .then(res => res.json()).then(data => { console.log(data) }).catch(err => console.log(err))
+            handleImageUpload().then((imageUrl) => {
+                fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl, user }) })
+                    .then(res => res.json())
+                    .then(data => {
+                        setTweets(prev => {
+                            const newTweets = [...prev.tweets, data.data]
+                            return { ...prev, tweets: newTweets }
+                        })
+                    })
+                    .catch(err => console.log(err))
             }).catch((err) => console.log(err)).finally(() => setTweetPosting(false));
         }
         else {
-            fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl: null, userId: user.uid }) })
-                .then((res => res.json())).then(data => console.log(data)).catch(err => console.log(err)).finally(() => setTweetPosting(false));
+            fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl: null, user }) })
+                .then((res => res.json()))
+                .then(data => {
+
+                    setTweets(prev => {
+                        const newTweets = [...prev.tweets, data.data]
+                        return { ...prev, tweets: newTweets }
+                    })
+                })
+                .catch(err => console.log(err))
+                .finally(() => setTweetPosting(false));
         }
+        setTweet('')
+        setImage(null)
+        setRenderImage(null)
     }
 
     return (
