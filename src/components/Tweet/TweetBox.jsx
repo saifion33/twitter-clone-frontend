@@ -12,6 +12,7 @@ import Popover from '../Popover'
 import { useUploadFile } from 'react-firebase-hooks/storage'
 import { getDownloadURL, ref } from 'firebase/storage'
 import Loadingbar from '../Loadingbar'
+import { useAuth } from '../../Context/auth.context'
 
 const MAX_FILE_SIZE = 1024 * 1024 * 2
 
@@ -23,6 +24,7 @@ const TweetBox = () => {
     const [tweetPosting, setTweetPosting] = useState(false)
     const [renderImage, setRenderImage] = useState(null)
     const [image, setImage] = useState(null)
+    const { loggedInUser } = useAuth()
     const handleChange = (e) => {
         setTweet(e.target.value)
     }
@@ -60,9 +62,16 @@ const TweetBox = () => {
     const handleTweet = async () => {
         setTweetPosting(true)
         const baseUrl = 'http://localhost:5000'
+
         if (image) {
             handleImageUpload().then(() => {
-                fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl: uploadedImageUrl, userId: user.uid }) })
+                const user = {
+                    name: loggedInUser.user.name,
+                    userName: loggedInUser.user.userName,
+                    id: loggedInUser.user.id,
+                    avatarUrl: loggedInUser.user.avatarUrl
+                }
+                fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl: uploadedImageUrl, user }) })
                     .then(res => res.json()).then(data => { console.log(data) }).catch(err => console.log(err))
             }).catch((err) => console.log(err)).finally(() => setTweetPosting(false));
         }

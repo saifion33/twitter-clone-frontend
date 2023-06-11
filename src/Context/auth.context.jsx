@@ -7,7 +7,7 @@ import { useAlert } from './alert.context'
 const authContext = createContext(null)
 
 const AuthContext = ({ children }) => {
-    const [loggedInUser, setLoggedInUser] = useState({ user: null, loading: false, error: null })
+    const [loggedInUser, setLoggedInUser] = useState(localStorage.getItem('loggedInUser') ? JSON.parse(localStorage.getItem('loggedInUser')) : { user: null, loading: false, error: null })
     const baseUrl = 'http://localhost:5000'
     const [signInGoogle] = useSignInWithGoogle(auth)
     const { showAlert } = useAlert()
@@ -20,9 +20,10 @@ const AuthContext = ({ children }) => {
             .then(googleResponse => {
 
                 const body = JSON.stringify({
+                    id: googleResponse.user.uid,
                     name: googleResponse._tokenResponse.displayName,
                     email: googleResponse._tokenResponse.email,
-                    userId: googleResponse._tokenResponse.email.split('@')[0],
+                    userName: googleResponse._tokenResponse.email.split('@')[0],
                     avatarUrl: googleResponse._tokenResponse.photoUrl
                 })
                 const method = 'POST'
@@ -31,8 +32,23 @@ const AuthContext = ({ children }) => {
                 // ** REGISTER NEW USER IN DATABASE
                 fetch(`${baseUrl}/newUser`, { method, headers, body })
                     .then(response => response.json())
-                    .then(response => { setLoggedInUser({ ...loggedInUser, user: response.data, loading: false }); console.log(response); showAlert('Signup successfully .', 'success') })
-                    .catch(err => { console.log(err); setLoggedInUser({ ...loggedInUser, loading: false, error: err }); showAlert(`Signup Failed ${err.message}`, 'danger') })
+                    .then(response => {
+                        setLoggedInUser(prev => {
+                            const newState = { ...prev, user: response.data, loading: false }
+                            localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                            return newState
+                        });
+                        showAlert('Signup successfully .', 'success')
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        setLoggedInUser(prev => {
+                            const newState = { ...prev, error: err }
+                            localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                            return newState
+                        });
+                        showAlert(`Signup Failed ${err.message}`, 'danger')
+                    })
             })
             .catch(err => {
                 console.log(err);
@@ -44,8 +60,7 @@ const AuthContext = ({ children }) => {
         try {
             const response = await fetch(`${baseUrl}/logged-in-user/${email}`)
             const user = await response.json();
-            console.log(user.data)
-            return user.data
+            return user
         } catch (error) {
             console.log(error)
             return error
@@ -59,17 +74,23 @@ const AuthContext = ({ children }) => {
             .then(async (googleResponse) => {
                 showAlert('SignIn Successfully .', 'success')
                 getLoggedInUser(googleResponse.user.email)
-                    .then(user => {
-                        setLoggedInUser(prev => ({ ...prev, user }))
+                    .then(response => {
+                        setLoggedInUser(prev => {
+                            const newState = { ...prev, user: response.data, loading: false }
+                            localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                            return newState
+                        })
                         showAlert('SignIn Successfully .', 'success')
                     })
                     .catch((error) => {
-                        setLoggedInUser(prev => ({ ...prev, error }))
+
+                        setLoggedInUser(prev => {
+                            const newState = { ...prev, error, loading: false }
+                            localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                            return newState
+                        })
                         console.log(error)
                         showAlert('SignIn Failed .' + error.message, 'danger')
-                    })
-                    .finally(() => {
-                        setLoggedInUser(prev => ({ ...prev, loading: false}))
                     })
             })
             .catch((err) => {
@@ -81,7 +102,7 @@ const AuthContext = ({ children }) => {
 
 
     return (
-        <authContext.Provider value={{ auth, SignUpWithGoogle, SignInWithGoogle, getLoggedInUser, loggedInUser }} >
+        <authContext.Provider value={{ auth, SignUpWithGoogle, SignInWithGoogle, getLoggedInUser, loggedInUser, setLoggedInUser }} >
             {children}
         </authContext.Provider>
     )

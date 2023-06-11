@@ -21,9 +21,17 @@ import { useAlert } from '../../Context/alert.context'
 const Sidebar = () => {
     const [signOut] = useSignOut(auth)
     const [user, loading, error] = useAuthState(auth)
-    const { loggedInUser } = useAuth()
+    const { loggedInUser, setLoggedInUser } = useAuth()
     const { isOpen, openModal, closeModal } = useModal()
     const { showAlert } = useAlert()
+    const handleSignOut = () => {
+        signOut().then(() => {
+            localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+            setLoggedInUser({ user: null, loading: false, error: null })
+            showAlert('Signout successfully .', 'danger')
+            closeModal()
+        })
+    }
     return (
 
         <div className='sidebar py-4 pl-24 pr-3 w-1/4 space-y-1 overflow-y-scroll max-h-screen'>
@@ -53,12 +61,12 @@ const Sidebar = () => {
                     <img className='w-8 rounded-full' src={user?.photoURL} alt={user?.displayName} />
                     <div className='pl-3'>
                         <p>{user?.displayName}</p>
-                        {loggedInUser.user && <p className='text-slate-600'>@{loggedInUser?.user?.userId}</p>}
+                        {loggedInUser.user && <p className='text-slate-600'>@{loggedInUser?.user?.userName}</p>}
                     </div>
                     <HiDotsHorizontal className='text-2xl ml-auto' onClick={openModal} />
                     <SmallModal isOpen={isOpen} onClose={closeModal} >
                         <div className='text-base p-4'>
-                            <button onClick={() => { signOut(); closeModal(); showAlert('Logout successfully ', 'info') }} className='bg-twitter-100 rounded-full text-white py-1 px-3 hover:bg-twitter-75 '>logOut {user?.displayName}</button>
+                            <button onClick={handleSignOut} className='bg-twitter-100 rounded-full text-white py-1 px-3 hover:bg-twitter-75 '>logOut {user?.displayName}</button>
                         </div>
                     </SmallModal>
 
