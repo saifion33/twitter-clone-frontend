@@ -15,6 +15,7 @@ import CustomNavLink from '../CustomNavLink'
 import SmallModal from '../Modal/SmallModal'
 import Loadingbar from '../Loadingbar'
 import { useAlert } from '../../Context/alert.context'
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -24,12 +25,14 @@ const Sidebar = () => {
     const { loggedInUser, setLoggedInUser } = useAuth()
     const { isOpen, openModal, closeModal } = useModal()
     const { showAlert } = useAlert()
+    const navigate = useNavigate()
     const handleSignOut = () => {
         signOut().then(() => {
             localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
             setLoggedInUser({ user: null, loading: false, error: null })
             showAlert('Signout successfully .', 'danger')
             closeModal()
+            navigate('/')
         })
     }
     return (

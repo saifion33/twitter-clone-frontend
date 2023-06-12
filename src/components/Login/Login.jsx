@@ -6,12 +6,15 @@ import { FcGoogle } from 'react-icons/fc'
 import { useFormik } from 'formik'
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth'
 import { auth } from '../../firebase/firebase'
+
 import Loadingbar from '../Loadingbar'
+import { useAlert } from '../../Context/alert.context'
 
 const Login = () => {
 
     const { SignInWithGoogle } = useAuth()
-    const [signInWithEmailAndPassword, user, loading, error,] = useSignInWithEmailAndPassword(auth);
+    const { showAlert } = useAlert()
+    const [signInWithEmailAndPassword, loading, error,] = useSignInWithEmailAndPassword(auth);
     const [isPasswordFormVisible, setIsPasswordFormVisible] = useState(false)
     const validate = (values) => {
         const errors = {}
@@ -46,7 +49,7 @@ const Login = () => {
             {
                 (!isPasswordFormVisible && !loading) && <div className='px-10 space-y-3'>
                     <button onClick={SignInWithGoogle} className='flex items-center bg-white py-1 px-8 rounded-full border-[1px] w-full gap-2 my-4'><FcGoogle /> Sign in with Google</button>
-                    <button className='flex items-center bg-white py-1 px-8 rounded-full border-[1px] w-full gap-2 my-4'><AiFillApple /> Sign in with Apple</button>
+                    <button onClick={() => showAlert('Comming Soon 😊.', 'info')} className='flex items-center bg-white py-1 px-8 rounded-full border-[1px] w-full gap-2 my-4'><AiFillApple /> Sign in with Apple</button>
                     <div className='flex items-center justify-center gap-2 w-full'>
                         <span className=' w-full h-[1px] bg-gray-400'></span>
                         <p>or</p>
