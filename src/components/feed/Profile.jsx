@@ -21,8 +21,10 @@ const Profile = () => {
           </div>
         </div>
         <div className='relative'>
-          <div className='bg-gray-200 w-full h-44'>
-          </div>
+          {!loggedInUser.user.bannerUrl && <div className='bg-gray-200 w-full h-44'></div>}
+          {loggedInUser.user.bannerUrl && <div className='bg-gray-200 w-full h-44'>
+            <img src={loggedInUser.user.bannerUrl} alt="banner" />
+          </div>}
           <div className='border-[6px] p-1 cursor-pointer border-white bg-gray-200 rounded-full absolute -bottom-14 left-10'>
             {
               loggedInUser.user.avatarUrl && <img className='rounded-full' src={loggedInUser.user.avatarUrl} alt="user avatar" />

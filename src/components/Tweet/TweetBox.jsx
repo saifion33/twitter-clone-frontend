@@ -107,7 +107,7 @@ const TweetBox = () => {
                 !tweetPosting && <div className='flex'>
                     <div>
                         {
-                            (user && !loading) && <img className='rounded-full w-16' src={user.photoURL} alt="avatar" />
+                            (loggedInUser.user && !loggedInUser.loading) && <img className='rounded-full w-16' src={loggedInUser.user.avatarUrl} alt="avatar" />
                         }
                     </div>
                     <div className='p-3 w-full'>
