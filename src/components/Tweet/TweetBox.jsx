@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react'
 
 import { BsCardImage, BsEmojiSmile } from 'react-icons/bs'
@@ -14,11 +15,12 @@ import { getDownloadURL, ref } from 'firebase/storage'
 import Loadingbar from '../Loadingbar'
 import { useAuth } from '../../Context/auth.context'
 import { useTweets } from '../../Context/tweet.context'
+import { useAlert } from '../../Context/alert.context'
 
 const MAX_FILE_SIZE = 1024 * 1024 * 2
 
-const TweetBox = () => {
-    const [user, loading] = useAuthState(auth)
+const TweetBox = ({ placeholder, buttonText }) => {
+    const [user] = useAuthState(auth)
     const [uploadImage] = useUploadFile(auth)
     const [tweet, setTweet] = useState('')
     const [tweetPosting, setTweetPosting] = useState(false)
@@ -26,6 +28,7 @@ const TweetBox = () => {
     const [image, setImage] = useState(null)
     const { loggedInUser } = useAuth()
     const { setTweets } = useTweets()
+    const { showAlert } = useAlert()
     const handleChange = (e) => {
         setTweet(e.target.value)
     }
@@ -111,7 +114,7 @@ const TweetBox = () => {
                         }
                     </div>
                     <div className='p-3 w-full'>
-                        <input onChange={handleChange} value={tweet} className='placeholder:text-xl placeholder:text-slate-500 p-2 w-full outline-none' type="text" name="tweet-input" id="tweet-input" placeholder='What&apos;s happning?!' />
+                        <input onChange={handleChange} value={tweet} className='placeholder:text-xl placeholder:text-slate-500 p-2 w-full outline-none' type="text" name="tweet-input" id="tweet-input" placeholder={placeholder} />
                         <div className='flex justify-between border-t-[2px] mt-6 py-4 px-2  items-center'>
                             <div className='flex gap-4 text-xl text-twitter-100   '>
                                 <div className=' cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
@@ -120,33 +123,33 @@ const TweetBox = () => {
                                         <input className='hidden' type="file" name="fileInput" onChange={handleFileSelect} accept='image/*' id="fileInput" />
                                     </Popover>
                                 </div>
-                                <div className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
+                                <div onClick={() => showAlert('Comming Soon... 😊')} className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
                                     <Popover message={'gif'}>
                                         <HiOutlineGif />
                                     </Popover>
                                 </div>
-                                <div className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
+                                <div onClick={() => showAlert('Comming Soon... 😊')} className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
                                     <Popover message={'poll'}>
                                         <MdOutlinePoll />
                                     </Popover>
                                 </div>
-                                <div className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
+                                <div onClick={() => showAlert('Comming Soon... 😊')} className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
                                     <Popover message={'emoji'}>
                                         <BsEmojiSmile />
                                     </Popover>
                                 </div>
-                                <div className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
+                                <div onClick={() => showAlert('Comming Soon... 😊')} className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
                                     <Popover message={'schedule'}>
                                         <TbCalendarTime />
                                     </Popover>
                                 </div>
-                                <div className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
+                                <div onClick={() => showAlert('Comming Soon... 😊')} className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
                                     <Popover message={'location'}>
                                         <IoLocationOutline />
                                     </Popover>
                                 </div>
                             </div>
-                            <button onClick={() => { handleTweet() }} disabled={tweet.length < 1} className='bg-twitter-100 rounded-full py-2 px-4 text-slate-200 disabled:bg-gray-500 font-semibold'>Tweet </button>
+                            <button onClick={() => { handleTweet() }} disabled={tweet.length < 1} className='bg-twitter-100 rounded-full py-2 px-4 text-slate-200 disabled:bg-gray-500 font-semibold'>{buttonText}</button>
                         </div>
                     </div>
                 </div>

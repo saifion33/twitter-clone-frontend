@@ -16,6 +16,7 @@ import { auth } from './firebase/firebase'
 import Feed from './components/feed/Feed'
 import Home from './components/feed/Home'
 import More from './components/feed/More'
+import TweetContext from './Context/tweet.context'
 
 
 
@@ -25,7 +26,9 @@ function App() {
   return (
     <>
       <div className='app flex'>
-        <Sidebar />
+        <TweetContext>
+          <Sidebar />
+        </TweetContext>
         <Routes>
           <Route path='/' element={<Feed />} >
             <Route path='/notifications' element={<Notifications />} />

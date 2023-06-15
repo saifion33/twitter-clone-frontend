@@ -7,9 +7,12 @@ import { BiMessageRounded, BiBarChart } from 'react-icons/bi'
 import { HiArrowUpTray } from 'react-icons/hi2'
 import { BsThreeDots } from 'react-icons/bs'
 import { GoVerified } from 'react-icons/go'
+import { useModal } from '../../utils/customHooks'
+import ReplyModal from './ReplyModal'
 
 const TweetCard = ({ tweet }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
+    const { isOpen: isReplyModalOpen, openModal: openReplyModal, closeModal: closeReplyModal } = useModal()
     const handleImageError = () => {
         setImageLoaded(false)
     }
@@ -43,7 +46,7 @@ const TweetCard = ({ tweet }) => {
                 }
             </div>
             <footer className='p-5 px-8 flex gap-6'>
-                <div className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>
+                <div onClick={openReplyModal} className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>
                     <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><BiMessageRounded /></div>
                     <span className='text-sm '>{tweet.reply.length}</span>
                 </div>
@@ -63,8 +66,8 @@ const TweetCard = ({ tweet }) => {
                     <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><HiArrowUpTray /></div>
                     <span className='text-sm'>3,455</span>
                 </div>
-
             </footer>
+            <ReplyModal isOpen={isReplyModalOpen} closeModal={closeReplyModal} tweet={tweet} />
         </div>
     )
 }

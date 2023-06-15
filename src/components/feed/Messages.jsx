@@ -1,8 +1,9 @@
 import React from 'react'
+import CommingSoon from '../CommingSoon'
 
 const Messages = () => {
   return (
-    <div>Messages</div>
+    <CommingSoon text={'Messages'} />
   )
 }
 

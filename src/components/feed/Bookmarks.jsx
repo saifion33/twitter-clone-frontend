@@ -1,8 +1,9 @@
 import React from 'react'
+import CommingSoon from '../CommingSoon'
 
 const Bookmarks = () => {
   return (
-    <div>Bookmarks</div>
+    <CommingSoon text={'Bookmarks'} />
   )
 }
 

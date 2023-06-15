@@ -6,15 +6,15 @@ const AlertContext = ({ children }) => {
     const [alertType, setAlertType] = useState('success');
     const [alertMessage, setAlertMessage] = useState('This is alert');
 
-    const showAlert = (message, type = 'success', time = 3000) => {
+    const showAlert = (message, type = 'info', time = 3000) => {
         setAlertType(type)
         setAlertMessage(message)
         setIsAlert(true)
         setTimeout(() => {
             setIsAlert(false)
-        },time);
+        }, time);
     }
-    
+
     return (
         <alertContext.Provider value={{ isAlert, alertType, alertMessage, showAlert }}>
             {children}

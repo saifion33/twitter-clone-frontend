@@ -65,7 +65,9 @@ const ProfileEditor = () => {
       .then(res => res.json())
       .then(res =>
         setLoggedInUser(prev => {
-          return { ...prev, user: res.data }
+          const updatedUser = { ...prev, user: res.data }
+          localStorage.setItem('loggedInUser', JSON.stringify(updatedUser))
+          return updatedUser
         })
       )
       .catch(err => console.error(err))

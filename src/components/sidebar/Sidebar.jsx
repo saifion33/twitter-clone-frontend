@@ -16,6 +16,8 @@ import SmallModal from '../Modal/SmallModal'
 import Loadingbar from '../Loadingbar'
 import { useAlert } from '../../Context/alert.context'
 import { useNavigate } from 'react-router-dom'
+import Modal from '../Modal/Modal'
+import TweetBox from '../Tweet/TweetBox'
 
 
 
@@ -24,6 +26,7 @@ const Sidebar = () => {
     const [user, loading, error] = useAuthState(auth)
     const { loggedInUser, setLoggedInUser } = useAuth()
     const { isOpen, openModal, closeModal } = useModal()
+    const { isOpen: isTweetModalOpen, openModal: openTweetModal, closeModal: closeTweetModal } = useModal()
     const { showAlert } = useAlert()
     const navigate = useNavigate()
     const handleSignOut = () => {
@@ -55,13 +58,16 @@ const Sidebar = () => {
                 <CustomNavLink active to={'/more'}><HiOutlineDotsCircleHorizontal />More</CustomNavLink></div>}
             {
                 (user && !loading) && <div className='tweet-button-container text-center p-4'>
-                    <button className='bg-twitter-100 w-full py-2 px-4 rounded-full text-xl text-white font-semibold hover:bg-sky-600'>Tweet</button>
+                    <button onClick={openTweetModal} className='bg-twitter-100 w-full py-2 px-4 rounded-full text-xl text-white font-semibold hover:bg-sky-600'>Tweet</button>
+                    <Modal isOpen={isTweetModalOpen} onClose={closeTweetModal} height={'40%'} >
+                        <TweetBox buttonText={'Tweet'} placeholder={"What's happning! "} />
+                    </Modal>
                 </div>
             }
 
             {
                 (loggedInUser.user && !loggedInUser.loading) && <div role='button' className='user-profile-button-container relative flex items-center rounded-full hover:bg-gray-200 p-3 justify-between cursor-pointer'>
-                    <img className='w-8 rounded-full' src={loggedInUser.user?.avatarUrl} alt={loggedInUser.user.name} />
+                    <img className='w-10 rounded-full' src={loggedInUser.user?.avatarUrl} alt={loggedInUser.user.name} />
                     <div className='pl-3'>
                         {loggedInUser.user && <p>{loggedInUser.user.name}</p>}
                         {loggedInUser.user && <p className='text-slate-600'>@{loggedInUser?.user?.userName}</p>}

@@ -13,7 +13,7 @@ const Home = () => {
   return (
     <div>
       <div>
-        {user && <TweetBox />}
+        {user && <TweetBox buttonText={'Tweet'} placeholder={"What's happning "} />}
         {loading && <Loadingbar height='10' width='10' />}
       </div>
       <div>
@@ -23,6 +23,9 @@ const Home = () => {
         }
         {
           (tweets.tweets && tweets.tweets.length == 0) && <div className='text-4xl text-twitter-100 font-semibold text-center py-5'>No Tweets !</div>
+        }
+        {
+          (!tweets.tweets && !tweets.loading) && <div className='text-2xl py-10 text-slate-600 font-semibold text-center'>Something went wrong...</div>
         }
       </div>
     </div>
