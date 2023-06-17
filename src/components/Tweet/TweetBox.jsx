@@ -1,37 +1,32 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react'
 
-import { BsCardImage, BsEmojiSmile } from 'react-icons/bs'
-import { HiOutlineGif } from 'react-icons/hi2'
 import { MdOutlinePoll, MdOutlineClose } from 'react-icons/md'
-import { TbCalendarTime } from 'react-icons/tb'
+import { BsCardImage, BsEmojiSmile } from 'react-icons/bs'
 import { IoLocationOutline } from 'react-icons/io5'
+import { TbCalendarTime } from 'react-icons/tb'
+import { HiOutlineGif } from 'react-icons/hi2'
 
-import { useAuthState } from 'react-firebase-hooks/auth'
-import { auth, storage } from '../../firebase/firebase'
-import Popover from '../Popover'
-import { useUploadFile } from 'react-firebase-hooks/storage'
-import { getDownloadURL, ref } from 'firebase/storage'
-import Loadingbar from '../Loadingbar'
-import { useAuth } from '../../Context/auth.context'
-import { useTweets } from '../../Context/tweet.context'
 import { useAlert } from '../../Context/alert.context'
+import { useAuth } from '../../Context/auth.context'
+import Loadingbar from '../Loadingbar'
+import Popover from '../Popover'
 
-const MAX_FILE_SIZE = 1024 * 1024 * 2
+const MAX_FILE_SIZE = 1024 * 1024 * 2  //Max file size 2MB
 
-const TweetBox = ({ placeholder, buttonText }) => {
-    const [user] = useAuthState(auth)
-    const [uploadImage] = useUploadFile(auth)
+const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) => {
     const [tweet, setTweet] = useState('')
     const [tweetPosting, setTweetPosting] = useState(false)
     const [renderImage, setRenderImage] = useState(null)
     const [image, setImage] = useState(null)
     const { loggedInUser } = useAuth()
-    const { setTweets } = useTweets()
     const { showAlert } = useAlert()
+
+
     const handleChange = (e) => {
         setTweet(e.target.value)
     }
+
     const handleFileSelect = (e) => {
 
         const selectedImage = e.target.files[0]
@@ -39,7 +34,7 @@ const TweetBox = ({ placeholder, buttonText }) => {
 
         if (selectedImage.size > MAX_FILE_SIZE) {
             setImage(null)
-            console.log('Please select a file less than 2MB')
+            console.log('Please select a file less than 2MB.')
             return
         }
         const reader = new FileReader();
@@ -53,20 +48,8 @@ const TweetBox = ({ placeholder, buttonText }) => {
         }
     }
 
-    const handleImageUpload = async () => {
-        try {
-            const result = await uploadImage(ref(storage, `/images/${user.uid}/${Date.now() + image.name}`), image, { cacheControl: `public , max-age=${3600 * 24 * 3}` });
-            const downloadurl = await getDownloadURL(result.ref)
-            return downloadurl
-        } catch (error) {
-            console.log(error)
-            return null
-        }
-    }
-
     const handleTweet = async () => {
         setTweetPosting(true)
-        const baseUrl = 'http://localhost:5000'
         const user = {
             name: loggedInUser.user.name,
             userName: loggedInUser.user.userName,
@@ -74,30 +57,16 @@ const TweetBox = ({ placeholder, buttonText }) => {
             avatarUrl: loggedInUser.user.avatarUrl
         }
         if (image) {
-            handleImageUpload().then((imageUrl) => {
-                fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl, user }) })
-                    .then(res => res.json())
-                    .then(data => {
-                        setTweets(prev => {
-                            const newTweets = [...prev.tweets, data.data]
-                            return { ...prev, tweets: newTweets }
-                        })
-                    })
-                    .catch(err => console.log(err))
-            }).catch((err) => console.log(err)).finally(() => setTweetPosting(false));
+            
+            // First upload the image and get image url then post tweet to database
+            handleImageUpload(image).then(async (imageUrl) => {
+                handleSubmit(tweet, imageUrl, user).finally(() => setTweetPosting(false));
+            })
         }
         else {
-            fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl: null, user }) })
-                .then((res => res.json()))
-                .then(data => {
 
-                    setTweets(prev => {
-                        const newTweets = [...prev.tweets, data.data]
-                        return { ...prev, tweets: newTweets }
-                    })
-                })
-                .catch(err => console.log(err))
-                .finally(() => setTweetPosting(false));
+            // Post tweet to database
+            handleSubmit(tweet, null, user).finally(() => setTweetPosting(false));
         }
         setTweet('')
         setImage(null)
@@ -157,9 +126,9 @@ const TweetBox = ({ placeholder, buttonText }) => {
             {
                 (image && !tweetPosting) && <div className='relative'>
                     <div onClick={() => { setImage(null) }} className='absolute top-5 left-5 text-3xl p-2 rounded-full bg-gray-200 cursor-pointer hover:text-red-600 hover:bg-gray-100'>
-                        <MdOutlineClose />
+                        <MdOutlineClose/>
                     </div>
-                    <img className='' src={renderImage} alt="user selected image" />
+                    <img className='' src={renderImage} alt="user selected image"/>
                 </div>
             }
             {

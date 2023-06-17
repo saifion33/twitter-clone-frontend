@@ -16,7 +16,7 @@ const ProfileEditor = () => {
   const [selectedBanner, setSelectedBanner] = useState(null)
   const [slectedAvatar, setSlectedAvatar] = useState(null)
 
-  const [uploadFile, uploading, snapshot, error] = useUploadFile();
+  const [uploadFile] = useUploadFile();
 
   const handleBannerSelect = (e) => {
     setSelectedBanner(e.target.files[0])
@@ -46,7 +46,7 @@ const ProfileEditor = () => {
       update.bannerUrl = bannerUrl
     }
     if (avatarImage) {
-      const file = await uploadFile(ref(storage, `User/${loggedInUser.user.id}/avatar/avatarImage`), avatarImage)
+      const file = await uploadFile(ref(storage, `Users/${loggedInUser.user.id}/avatar/avatarImage`), avatarImage)
       const avatarUrl = await getDownloadURL(file.ref)
       update.avatarUrl = avatarUrl
     }
