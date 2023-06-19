@@ -2,10 +2,10 @@
 import React from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
 
-const SmallModal = ({ isOpen, onClose, children }) => {
+const SmallModal = ({ isOpen, onClose, children, position }) => {
 
     return (
-        isOpen && <div className='absolute top-0 bg-white rounded-md p-2  shadow-md w-fit'>
+        isOpen && <div className={`absolute top-2 ${position} bg-white rounded-md p-2  shadow-md w-fit`}>
             <div className='p-1 flex justify-end cursor-pointer border-b '>
                 <AiOutlineClose className='text-sm' onClick={onClose} />
             </div>

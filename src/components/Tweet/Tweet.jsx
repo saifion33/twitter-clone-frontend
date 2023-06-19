@@ -8,11 +8,13 @@ import { useUploadFile } from "react-firebase-hooks/storage"
 import { auth, storage } from "../../firebase/firebase"
 import { getDownloadURL, ref } from "firebase/storage"
 import { useAuth } from "../../Context/auth.context"
+import { useAlert } from "../../Context/alert.context"
 
 
 
 const Tweet = () => {
     const navigate = useNavigate()
+    const { showAlert } = useAlert()
     const { id } = useParams()
     const tweet = JSON.parse(sessionStorage.getItem('tweet'))
     const [replies, setReplies] = useState(null)
@@ -53,16 +55,28 @@ const Tweet = () => {
         sessionStorage.removeItem('tweet')
         navigate('/')
     }
+    const deleteReply = (replyId) => {
+        fetch(`http://localhost:5000/deleteReply/${tweet._id}/${replyId}`, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(() => {
+                setReplies(prev => {
+                    const newReplies = prev.filter(reply => reply._id !== replyId)
+                    sessionStorage.setItem('replies', JSON.stringify(newReplies));
+                    return newReplies
+                })
+                showAlert('Deleted Reply successfully. ', 'success')
+            })
+    }
     return (
         <div key={id}>
-            <div className="sticky top-0 left-0 flex gap-5 p-4 bg-white shadow-md">
+            <div className="sticky z-10 top-0 left-0 flex gap-5 p-4 bg-white shadow-md">
                 <MdOutlineArrowBack onClick={returnHandler} className="text-2xl cursor-pointer" />
                 <p>Tweet</p>
             </div>
             <TweetCard tweet={tweet} />
             <TweetBox buttonText={'Reply'} placeholder={'Reply your tweet '} handleImageUpload={handleImageUpload} handleSubmit={handleReply} />
             <div className="ml-4 border-l-2 pl-4">
-                {(replies) && replies.map(reply => <TweetCard key={reply._id} tweet={reply} />)}
+                {(replies) && replies.map(reply => <TweetCard deleteTweet={deleteReply} key={reply._id} tweet={reply} />)}
                 {(replies && replies.length == 0) && <div>No replies</div>}
             </div>
 

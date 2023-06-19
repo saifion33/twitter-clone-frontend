@@ -7,11 +7,12 @@ import Loadingbar from '../Loadingbar'
 import { useTweets } from '../../Context/tweet.context'
 import { useUploadFile } from 'react-firebase-hooks/storage'
 import { getDownloadURL, ref } from 'firebase/storage'
+import { useAlert } from '../../Context/alert.context'
 
 const Home = () => {
   const [user, loading] = useAuthState(auth)
   const [uploadImage] = useUploadFile(auth)
-
+  const { showAlert } = useAlert()
   const { tweets, setTweets } = useTweets()
 
 
@@ -39,6 +40,17 @@ const Home = () => {
     }
 
   }
+  const deleteTweet = (tweetId) => {
+    fetch(`http://localhost:5000/deleteTweet/${tweetId}`, { method: 'DELETE' })
+      .then((res) => res.json())
+      .then(() => {
+        setTweets(prev => {
+          const newTweets = prev.tweets.filter(tweet => tweet._id !== tweetId)
+          return { ...prev, tweets: newTweets }
+        })
+        showAlert('Tweet has been deleted', 'success')
+      }).catch(error => console.log(error))
+  }
 
   return (
     <div>
@@ -49,7 +61,7 @@ const Home = () => {
       <div>
         {tweets.loading && <Loadingbar />}
         {
-          (tweets.tweets && tweets.tweets.length > 0 && !tweets.loading) && tweets.tweets.map((tweet) => <TweetCard tweet={tweet} key={tweet._id} />)
+          (tweets.tweets && tweets.tweets.length > 0 && !tweets.loading) && tweets.tweets.map((tweet) => <TweetCard deleteTweet={deleteTweet} tweet={tweet} key={tweet._id} />)
         }
         {
           (tweets.tweets && tweets.tweets.length == 0) && <div className='text-4xl text-twitter-100 font-semibold text-center py-5'>No Tweets !</div>

@@ -10,11 +10,14 @@ import { GoVerified } from 'react-icons/go'
 import { useModal } from '../../utils/customHooks'
 import ReplyModal from './ReplyModal'
 import { useNavigate } from 'react-router-dom'
+import SmallModal from '../Modal/SmallModal'
+import { MdDelete } from 'react-icons/md'
 
-const TweetCard = ({ tweet }) => {
+const TweetCard = ({ tweet ,deleteTweet}) => {
     const [imageLoaded, setImageLoaded] = useState(true)
     const navigate = useNavigate()
     const { isOpen: isReplyModalOpen, openModal: openReplyModal, closeModal: closeReplyModal } = useModal()
+    const { isOpen: isOptionOpen, openModal: openOptionModal, closeModal: closeOptionModal } = useModal()
 
     const handleImageError = () => {
         setImageLoaded(false)
@@ -27,10 +30,12 @@ const TweetCard = ({ tweet }) => {
         sessionStorage.setItem('replies', JSON.stringify(replies.data))
         navigate(`/tweet/${tweet._id}`, { relative: 'path' })
     }
-
+    const handleDeleteTweet = () => {
+        deleteTweet(tweet._id)
+    }
     return (
         <>
-            <div className='p-6 cursor-pointer hover:bg-gray-100 '>
+            <div className='p-6 cursor-pointer hover:bg-gray-100 relative '>
                 <div onClick={openTweet}>
                     <header className='flex gap-4 items-center'>
                         <div >
@@ -43,7 +48,7 @@ const TweetCard = ({ tweet }) => {
                             <p className='text-gray-700 hover:underline '>@{tweet.user.userName}</p>
                             <TimeAgo className='text-gray-700 ml-3' date={new Date(tweet.postedOn)} />
                         </div>
-                        <div className='ml-auto mr-5 cursor-pointer p-2 rounded-full hover:bg-twitter-25 bg-opacity-10 hover:text-twitter-100 transition-colors duration-300 text-xl'>
+                        <div onClick={(e) => { e.stopPropagation(); openOptionModal() }} className='ml-auto mr-5 cursor-pointer p-2 rounded-full hover:bg-twitter-25 bg-opacity-10 hover:text-twitter-100 transition-colors duration-300 text-xl'>
                             <BsThreeDots />
                         </div>
                     </header>
@@ -81,6 +86,11 @@ const TweetCard = ({ tweet }) => {
                         <span className='text-sm'>3,455</span>
                     </div>
                 </footer>
+                <SmallModal position={'right-2'} isOpen={isOptionOpen} onClose={closeOptionModal} >
+                    <div className='p-3 '>
+                        <div onClick={handleDeleteTweet} className='flex gap-2 items-center text-red-600'><MdDelete /> Delete Tweet</div>
+                    </div>
+                </SmallModal>
             </div>
             <ReplyModal isOpen={isReplyModalOpen} closeModal={closeReplyModal} tweet={tweet} />
         </>
