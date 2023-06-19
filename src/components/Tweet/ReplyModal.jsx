@@ -22,16 +22,16 @@ const ReplyModal = ({ isOpen, closeModal, tweet }) => {
             return null
         }
     }
-    const handleReply = async (reply, imageUrl, user) => {
+    const handleReply = async (replyTweet, imageUrl, user) => {
         const baseUrl = 'http://localhost:5000'
         try {
-            const response = await fetch(`${baseUrl}/reply/${tweet._id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reply, imageUrl, user }) })
+            const response = await fetch(`${baseUrl}/reply/${tweet._id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
             const newReply = await response.json()
             console.log(newReply)
             closeModal()
         } catch (error) {
             console.log(error)
-            closeModal() 
+            closeModal()
         }
 
     }

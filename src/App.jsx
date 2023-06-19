@@ -17,6 +17,7 @@ import Feed from './components/feed/Feed'
 import Home from './components/feed/Home'
 import More from './components/feed/More'
 import TweetContext from './Context/tweet.context'
+import Tweet from './components/Tweet/Tweet'
 
 
 
@@ -39,6 +40,7 @@ function App() {
             <Route path='/profile' element={<Profile />} />
             <Route path='/lists' element={<Lists />} />
             <Route path='/more' element={<More />} />
+            <Route path='/tweet/:id' element={<Tweet />} />
             <Route path='/' element={<Home />} />
           </Route>
         </Routes>
