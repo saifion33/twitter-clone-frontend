@@ -13,8 +13,19 @@ const TweetContext = ({ children }) => {
             .catch((error) => console.log(error))
             .finally(setTweets(prev => { return { ...prev, loading: false } }))
     }, [])
+    const increaseTweetReplyCount = (tweetId) => {
+        setTweets(prev => {
+            const newTweets = prev.tweets.map(tweet => {
+                if (tweet._id == tweetId) {
+                    tweet.replyCount += 1;
+                }
+                return tweet
+            })
+            return { ...prev, tweets: newTweets }
+        })
+    }
     return (
-        <tweetContext.Provider value={{ tweets,setTweets}} >
+        <tweetContext.Provider value={{ tweets, setTweets,increaseTweetReplyCount }} >
             {children}
         </tweetContext.Provider>
     )

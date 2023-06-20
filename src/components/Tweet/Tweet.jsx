@@ -9,6 +9,7 @@ import { auth, storage } from "../../firebase/firebase"
 import { getDownloadURL, ref } from "firebase/storage"
 import { useAuth } from "../../Context/auth.context"
 import { useAlert } from "../../Context/alert.context"
+import { useTweets } from "../../Context/tweet.context"
 
 
 
@@ -16,11 +17,16 @@ const Tweet = () => {
     const navigate = useNavigate()
     const { showAlert } = useAlert()
     const { id } = useParams()
-    const tweet = JSON.parse(sessionStorage.getItem('tweet'))
+    const [isTweetOpen, setIsTweetOpen] = useState(false)
+    const { increaseTweetReplyCount } = useTweets()
+    const [tweet, setTweet] = useState(null)
     const [replies, setReplies] = useState(null)
     useEffect(() => {
+        const tweet = JSON.parse(sessionStorage.getItem('tweet'))
+        setTweet(tweet)
         const replies = JSON.parse(sessionStorage.getItem('replies'))
         setReplies(replies)
+        setIsTweetOpen(tweet._id)
     }, [id])
     const [uploadImage] = useUploadFile(auth)
     const { loggedInUser } = useAuth()
@@ -37,11 +43,15 @@ const Tweet = () => {
     const handleReply = async (replyTweet, imageUrl, user) => {
         const baseUrl = 'http://localhost:5000'
         try {
-            const response = await fetch(`${baseUrl}/reply/${tweet._id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
+            const response = await fetch(`${baseUrl}/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
             const newReply = await response.json()
             setReplies(prev => {
                 const newReplies = [...prev, newReply.data]
                 sessionStorage.setItem('replies', JSON.stringify(newReplies))
+                setTweet(prev => {
+                    return { ...prev, replyCount: prev.replyCount + 1 }
+                })
+                increaseTweetReplyCount(tweet._id)
                 return newReplies
             })
         } catch (error) {
@@ -62,6 +72,7 @@ const Tweet = () => {
                 setReplies(prev => {
                     const newReplies = prev.filter(reply => reply._id !== replyId)
                     sessionStorage.setItem('replies', JSON.stringify(newReplies));
+
                     return newReplies
                 })
                 showAlert('Deleted Reply successfully. ', 'success')
@@ -73,10 +84,10 @@ const Tweet = () => {
                 <MdOutlineArrowBack onClick={returnHandler} className="text-2xl cursor-pointer" />
                 <p>Tweet</p>
             </div>
-            <TweetCard tweet={tweet} />
-            <TweetBox buttonText={'Reply'} placeholder={'Reply your tweet '} handleImageUpload={handleImageUpload} handleSubmit={handleReply} />
+            {tweet && <TweetCard setReplies={setReplies} isTweetOpen={isTweetOpen} tweet={tweet} />}
+            {tweet && <TweetBox buttonText={'Reply'} placeholder={'Reply your tweet '} handleImageUpload={handleImageUpload} handleSubmit={handleReply} />}
             <div className="ml-4 border-l-2 pl-4">
-                {(replies) && replies.map(reply => <TweetCard deleteTweet={deleteReply} key={reply._id} tweet={reply} />)}
+                {(replies) && replies.map(reply => <TweetCard setReplies={setReplies} deleteTweet={deleteReply} key={reply._id} tweet={reply} />)}
                 {(replies && replies.length == 0) && <div>No replies</div>}
             </div>
 

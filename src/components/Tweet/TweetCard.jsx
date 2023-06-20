@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import SmallModal from '../Modal/SmallModal'
 import { MdDelete } from 'react-icons/md'
 
-const TweetCard = ({ tweet ,deleteTweet}) => {
+const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
     const navigate = useNavigate()
     const { isOpen: isReplyModalOpen, openModal: openReplyModal, closeModal: closeReplyModal } = useModal()
@@ -67,7 +67,7 @@ const TweetCard = ({ tweet ,deleteTweet}) => {
                 <footer className='p-5 px-8 flex gap-6'>
                     <div onClick={openReplyModal} className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>
                         <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><BiMessageRounded /></div>
-                        <span className='text-sm '>{0}</span>
+                        <span className='text-sm '>{tweet.replyCount}</span>
                     </div>
                     <div className='flex gap-2 items-center text-gray-700 group hover:text-green-600 cursor-pointer w-fit transition-all duration-300 '>
                         <div className='text-lg  group-hover:bg-green-200  rounded-full p-1'><AiOutlineRetweet /></div>
@@ -92,7 +92,7 @@ const TweetCard = ({ tweet ,deleteTweet}) => {
                     </div>
                 </SmallModal>
             </div>
-            <ReplyModal isOpen={isReplyModalOpen} closeModal={closeReplyModal} tweet={tweet} />
+            <ReplyModal isOpen={isReplyModalOpen} isTweetOpen={isTweetOpen} isReply={tweet.isReply} setReplies={setReplies} closeModal={closeReplyModal} tweet={tweet} />
         </>
     )
 }

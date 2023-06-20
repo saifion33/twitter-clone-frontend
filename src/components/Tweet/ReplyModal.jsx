@@ -9,7 +9,7 @@ import { auth, storage } from '../../firebase/firebase'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { useAuth } from '../../Context/auth.context'
 
-const ReplyModal = ({ isOpen, closeModal, tweet }) => {
+const ReplyModal = ({ isOpen, closeModal, tweet, setReplies,isTweetOpen }) => {
     const { loggedInUser } = useAuth()
     const [uploadImage] = useUploadFile(auth)
     const handleImageUpload = async (image) => {
@@ -25,9 +25,16 @@ const ReplyModal = ({ isOpen, closeModal, tweet }) => {
     const handleReply = async (replyTweet, imageUrl, user) => {
         const baseUrl = 'http://localhost:5000'
         try {
-            const response = await fetch(`${baseUrl}/reply/${tweet._id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
+            const response = await fetch(`${baseUrl}/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
             const newReply = await response.json()
-            console.log(newReply)
+            if (tweet.replyOf && isTweetOpen==tweet._id) {
+                setReplies(prev => {
+                    const newReplies = [...prev, newReply.data]
+                    sessionStorage.setItem('replies', JSON.stringify(newReplies))
+                    return newReplies
+                })
+            }
+            tweet.replyCount += 1
             closeModal()
         } catch (error) {
             console.log(error)
