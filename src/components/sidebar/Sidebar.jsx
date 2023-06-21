@@ -9,7 +9,7 @@ import { useAuth } from '../../Context/auth.context'
 import { HiOutlineEnvelope, } from 'react-icons/hi2'
 import { useModal } from '../../utils/customHooks'
 import { AiOutlineSetting } from 'react-icons/ai'
-import { auth } from '../../firebase/firebase'
+import { auth, storage } from '../../firebase/firebase'
 import { BiHomeCircle } from 'react-icons/bi'
 import CustomNavLink from '../CustomNavLink'
 import SmallModal from '../Modal/SmallModal'
@@ -18,16 +18,21 @@ import { useAlert } from '../../Context/alert.context'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../Modal/Modal'
 import TweetBox from '../Tweet/TweetBox'
+import { useUploadFile } from 'react-firebase-hooks/storage'
+import { getDownloadURL, ref } from 'firebase/storage'
+import { useTweets } from '../../Context/tweet.context'
 
 
 
 const Sidebar = () => {
     const [signOut] = useSignOut(auth)
     const [user, loading, error] = useAuthState(auth)
+    const [uploadImage] = useUploadFile(auth)
     const { loggedInUser, setLoggedInUser } = useAuth()
     const { isOpen, openModal, closeModal } = useModal()
     const { isOpen: isTweetModalOpen, openModal: openTweetModal, closeModal: closeTweetModal } = useModal()
     const { showAlert } = useAlert()
+    const { pushTweet } = useTweets()
     const navigate = useNavigate()
     const handleSignOut = () => {
         signOut().then(() => {
@@ -37,6 +42,29 @@ const Sidebar = () => {
             closeModal()
             navigate('/')
         })
+    }
+    const handleImageUpload = async (image) => {
+        try {
+            const result = await uploadImage(ref(storage, `/images/${user.uid}/${Date.now() + image.name}`), image, { cacheControl: `public , max-age=${3600 * 24 * 3}` });
+            const downloadurl = await getDownloadURL(result.ref)
+            return downloadurl
+        } catch (error) {
+            console.log(error)
+            return null
+        }
+    }
+    const handleTweet = async (tweet, imageUrl, user) => {
+        const baseUrl = 'http://localhost:5000'
+        try {
+            const response = await fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl, user }) })
+            const newTweet = await response.json()
+            pushTweet(newTweet.data)
+            closeTweetModal()
+        } catch (error) {
+            console.log(error)
+            closeTweetModal()
+        }
+
     }
     return (
 
@@ -60,7 +88,7 @@ const Sidebar = () => {
                 (user && !loading) && <div className='tweet-button-container text-center p-4'>
                     <button onClick={openTweetModal} className='bg-twitter-100 w-full py-2 px-4 rounded-full text-xl text-white font-semibold hover:bg-sky-600'>Tweet</button>
                     <Modal isOpen={isTweetModalOpen} onClose={closeTweetModal} height={'40%'} >
-                        <TweetBox buttonText={'Tweet'} placeholder={"What's happning! "} />
+                        <TweetBox buttonText={'Tweet'} placeholder={"What's happning! "} handleImageUpload={handleImageUpload} handleSubmit={handleTweet} />
                     </Modal>
                 </div>
             }

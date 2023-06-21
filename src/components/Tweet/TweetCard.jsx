@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import TimeAgo from 'react-timeago'
 import imagePlaceholder from '../../assets/image-placeholder.svg'
-import { AiOutlineHeart, AiOutlineRetweet } from 'react-icons/ai'
+import { AiOutlineHeart, AiFillHeart, AiOutlineRetweet } from 'react-icons/ai'
 import { BiMessageRounded, BiBarChart } from 'react-icons/bi'
 import { HiArrowUpTray } from 'react-icons/hi2'
 import { BsThreeDots } from 'react-icons/bs'
@@ -12,9 +12,14 @@ import ReplyModal from './ReplyModal'
 import { useNavigate } from 'react-router-dom'
 import SmallModal from '../Modal/SmallModal'
 import { MdDelete } from 'react-icons/md'
+import { useAuth } from '../../Context/auth.context'
+import { useAlert } from '../../Context/alert.context'
 
 const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
+    const { loggedInUser } = useAuth()
+    const { showAlert } = useAlert()
+    const [likes, setLikes] = useState(tweet.likes)
     const navigate = useNavigate()
     const { isOpen: isReplyModalOpen, openModal: openReplyModal, closeModal: closeReplyModal } = useModal()
     const { isOpen: isOptionOpen, openModal: openOptionModal, closeModal: closeOptionModal } = useModal()
@@ -32,6 +37,34 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     }
     const handleDeleteTweet = () => {
         deleteTweet(tweet._id)
+    }
+    const userId = loggedInUser.user.id
+    const isLiked = likes.includes(userId)
+    const handleLikeTweet = () => {
+        if (isLiked) {
+            setLikes(prev => {
+                const newLikes = prev.filter(id => id != userId)
+                return newLikes
+            })
+        }
+        else {
+            setLikes(prev => [...prev, userId])
+        }
+        const url = `http://localhost:5000/like/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`
+        fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId }) }).then(() => {
+        }).catch(err => {
+            console.log(err)
+            if (!isLiked) {
+                setLikes(prev => {
+                    const newLikes = prev.filter(id => id != userId)
+                    return newLikes
+                })
+            }
+            else {
+                setLikes(prev => [...prev, userId])
+            }
+            showAlert('Something went wrong', 'danger')
+        })
     }
     return (
         <>
@@ -73,9 +106,9 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
                         <div className='text-lg  group-hover:bg-green-200  rounded-full p-1'><AiOutlineRetweet /></div>
                         <span className='text-sm'>5,780</span>
                     </div>
-                    <div className='flex gap-2 items-center text-gray-700 group hover:text-pink-600 cursor-pointer w-fit transition-all duration-300 '>
-                        <div className='text-lg  group-hover:bg-pink-300 rounded-full p-1'><AiOutlineHeart /></div>
-                        <span className='text-sm'>{tweet.likes.length}</span>
+                    <div onClick={handleLikeTweet} className={`${isLiked ? 'text-pink-600' : 'text-gray-700'} flex gap-2 items-center  group hover:text-pink-600 cursor-pointer w-fit transition-all duration-300 `}>
+                        <div className='text-lg  group-hover:bg-pink-300 rounded-full p-1'>{isLiked ? <AiFillHeart /> : <AiOutlineHeart />}</div>
+                        <span className='text-sm'>{likes.length}</span>
                     </div>
                     <div className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>
                         <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><BiBarChart /></div>

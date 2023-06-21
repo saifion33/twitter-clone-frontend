@@ -24,8 +24,14 @@ const TweetContext = ({ children }) => {
             return { ...prev, tweets: newTweets }
         })
     }
+    const pushTweet = (tweet) => {
+        setTweets(prev => {
+            const newTweets = [...prev.tweets, tweet]
+            return { ...prev, tweets: newTweets }
+        })
+    }
     return (
-        <tweetContext.Provider value={{ tweets, setTweets,increaseTweetReplyCount }} >
+        <tweetContext.Provider value={{ tweets, setTweets,increaseTweetReplyCount,pushTweet }} >
             {children}
         </tweetContext.Provider>
     )

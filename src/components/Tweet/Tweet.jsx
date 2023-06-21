@@ -78,6 +78,7 @@ const Tweet = () => {
                 showAlert('Deleted Reply successfully. ', 'success')
             })
     }
+    
     return (
         <div key={id}>
             <div className="sticky z-10 top-0 left-0 flex gap-5 p-4 bg-white shadow-md">
