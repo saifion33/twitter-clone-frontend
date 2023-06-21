@@ -61,7 +61,7 @@ const ProfileEditor = () => {
       update.location = values.location
     }
 
-    fetch(`http://localhost:5000/updateUser`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'rajadevid999@gmail.com', update }) })
+    fetch(`http://localhost:5000/updateUser`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: loggedInUser.user.email, update }) })
       .then(res => res.json())
       .then(res =>
         setLoggedInUser(prev => {

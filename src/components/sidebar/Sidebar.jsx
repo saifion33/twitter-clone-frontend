@@ -71,7 +71,7 @@ const Sidebar = () => {
         <div className='sidebar py-4 pl-24 pr-3 w-1/4 space-y-1 overflow-y-scroll max-h-screen'>
 
             <div className='p-4'>
-                <FaTwitter className='text-twitter-100 text-3xl cursor-pointer' />
+                <FaTwitter onClick={() => navigate('/')} className='text-twitter-100 text-3xl cursor-pointer' />
             </div>
             {(user && !loading) && <CustomNavLink active to={'/'}><BiHomeCircle />Home</CustomNavLink>}
             <CustomNavLink to={'/explore'}><FaHashtag />Expore</CustomNavLink>

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from 'react'
+import React, { useEffect } from 'react'
 import Modal from '../Modal/Modal'
 import TimeAgo from 'react-timeago'
 import { GoVerified } from 'react-icons/go'
@@ -8,9 +8,17 @@ import { useUploadFile } from 'react-firebase-hooks/storage'
 import { auth, storage } from '../../firebase/firebase'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { useAuth } from '../../Context/auth.context'
+import { useNavigate } from 'react-router-dom'
 
-const ReplyModal = ({ isOpen, closeModal, tweet, setReplies,isTweetOpen }) => {
+const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
     const { loggedInUser } = useAuth()
+    const navigate = useNavigate()
+    useEffect(() => {
+        if (!loggedInUser.user) {
+            navigate('/login')
+            return
+        }
+    }, [])
     const [uploadImage] = useUploadFile(auth)
     const handleImageUpload = async (image) => {
         try {
@@ -27,7 +35,7 @@ const ReplyModal = ({ isOpen, closeModal, tweet, setReplies,isTweetOpen }) => {
         try {
             const response = await fetch(`${baseUrl}/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
             const newReply = await response.json()
-            if (tweet.replyOf && isTweetOpen==tweet._id) {
+            if (tweet.replyOf && isTweetOpen == tweet._id) {
                 setReplies(prev => {
                     const newReplies = [...prev, newReply.data]
                     sessionStorage.setItem('replies', JSON.stringify(newReplies))

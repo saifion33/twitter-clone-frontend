@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react'
 
 import { useAuth } from '../../Context/auth.context'
@@ -5,10 +6,12 @@ import { AiFillApple } from 'react-icons/ai'
 import { FcGoogle } from 'react-icons/fc'
 import CreateAccount from './CreateAccount'
 import { useAlert } from '../../Context/alert.context'
+import { useNavigate } from 'react-router-dom'
 
 const Signup = () => {
     const { SignUpWithGoogle } = useAuth()
     const { showAlert } = useAlert()
+    const navigate = useNavigate()
     const handleGoogleSignup = () => {
         SignUpWithGoogle()
     }
@@ -31,7 +34,7 @@ const Signup = () => {
                             By signing up, you agree to the <span className='text-blue-600'>Terms of Service</span> and <span className='text-blue-600'>Privacy Policy</span>, including <span className='text-blue-600'>Cookie Use.</span>
                         </p>
                         <div className='py-2'>
-                            <p className='text-sm text-gray-700'>Don&apos;t have an account? <span className='text-[--twitter-color] cursor-pointer'>Log in</span></p>
+                            <p className='text-sm text-gray-700'>Already have an account? <span onClick={() => navigate('/login')} className='text-twitter-100 cursor-pointer'>Log in</span></p>
                         </div>
                     </div>
                 </>

@@ -9,11 +9,13 @@ import { auth } from '../../firebase/firebase'
 
 import Loadingbar from '../Loadingbar'
 import { useAlert } from '../../Context/alert.context'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
 
     const { SignInWithGoogle } = useAuth()
     const { showAlert } = useAlert()
+    const navigate = useNavigate()
     const [signInWithEmailAndPassword, loading, error,] = useSignInWithEmailAndPassword(auth);
     const [isPasswordFormVisible, setIsPasswordFormVisible] = useState(false)
     const validate = (values) => {
@@ -62,7 +64,7 @@ const Login = () => {
                         <button className='bg-white hover:bg-gray-100 border-[1px] py-2 rounded-full text-slate-800 text-base font-semibold '>Forgot Password?</button>
                     </div>
                     <div className='py-2'>
-                        <p className='text-sm text-gray-700'>Don&apos;t have an account? <span className='text-twitter-100 cursor-pointer'>Sign up</span></p>
+                        <p className='text-sm text-gray-700'>Don&apos;t have an account? <span onClick={() => navigate('/signup')} className='text-twitter-100 cursor-pointer'>Sign up</span></p>
                     </div>
                 </div>
             }

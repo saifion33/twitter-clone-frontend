@@ -4,7 +4,10 @@ import { useFormik } from 'formik'
 import { auth } from '../../firebase/firebase'
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth'
 import Loadingbar from '../Loadingbar'
+import { useAuth } from '../../Context/auth.context'
 const CreateAccount = ({ setIsCreateAccount }) => {
+
+    // eslint-disable-next-line no-unused-vars
     const [CreateAccount, user, loading, error] = useCreateUserWithEmailAndPassword(auth)
     const nameRef = useRef(null)
     const emailRef = useRef(null)
@@ -12,6 +15,7 @@ const CreateAccount = ({ setIsCreateAccount }) => {
     const [nameActive, setNameActive] = useState(false)
     const [emailActive, setEmailActive] = useState(false)
     const [passwordActive, setPasswordActive] = useState(false)
+    const { SignUpWithEmailAndPassword } = useAuth()
     const validate = values => {
         const errors = {};
         if (!values.name) {
@@ -42,17 +46,7 @@ const CreateAccount = ({ setIsCreateAccount }) => {
             password: '',
         }, validate,
         onSubmit: async (values) => {
-            try {
-                const response = await CreateAccount(values.email, values.password)
-                if (response) {
-                    response.user.displayName = values.name;
-                    formik.resetForm()
-                    return
-                }
-                alert('May be user account already exists')
-            } catch (error) {
-                console.log(error)
-            }
+            SignUpWithEmailAndPassword(values.name, values.email, values.password)
         }
     })
 

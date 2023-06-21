@@ -41,6 +41,7 @@ const Profile = () => {
           <div>
             <h1 className='text-2xl font-semibold'>{loggedInUser?.user?.name}</h1>
             <p className='text-slate-600'>@{loggedInUser?.user?.userName}</p>
+            {loggedInUser.user.bio && <p className=' text-slate-600'>{loggedInUser.user.bio}</p>}
           </div>
           <div className='py-3 flex gap-3 text-slate-600 items-center'>
             <MdOutlineCalendarMonth className='text-xl' />

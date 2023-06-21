@@ -18,6 +18,8 @@ import Home from './components/feed/Home'
 import More from './components/feed/More'
 import TweetContext from './Context/tweet.context'
 import Tweet from './components/Tweet/Tweet'
+import LoginPage from './LoginPage'
+import SignupPage from './SignupPage'
 
 
 
@@ -43,6 +45,8 @@ function App() {
             <Route path='/tweet/:id' element={<Tweet />} />
             <Route path='/' element={<Home />} />
           </Route>
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/signup' element={<SignupPage />} />
         </Routes>
         <WidgetBar />
       </div>

@@ -7,6 +7,7 @@ import { BiMessageRounded, BiBarChart } from 'react-icons/bi'
 import { HiArrowUpTray } from 'react-icons/hi2'
 import { BsThreeDots } from 'react-icons/bs'
 import { GoVerified } from 'react-icons/go'
+import { IoIosShareAlt } from 'react-icons/io'
 import { useModal } from '../../utils/customHooks'
 import ReplyModal from './ReplyModal'
 import { useNavigate } from 'react-router-dom'
@@ -17,13 +18,14 @@ import { useAlert } from '../../Context/alert.context'
 
 const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
+
     const { loggedInUser } = useAuth()
     const { showAlert } = useAlert()
     const [likes, setLikes] = useState(tweet.likes)
     const navigate = useNavigate()
     const { isOpen: isReplyModalOpen, openModal: openReplyModal, closeModal: closeReplyModal } = useModal()
     const { isOpen: isOptionOpen, openModal: openOptionModal, closeModal: closeOptionModal } = useModal()
-
+    const isAdmin = loggedInUser.user && tweet.user.id === loggedInUser.user.id
     const handleImageError = () => {
         setImageLoaded(false)
 
@@ -38,9 +40,13 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     const handleDeleteTweet = () => {
         deleteTweet(tweet._id)
     }
-    const userId = loggedInUser.user.id
+    const userId = loggedInUser.user && loggedInUser.user.id
     const isLiked = likes.includes(userId)
     const handleLikeTweet = () => {
+        if (!loggedInUser.user) {
+            navigate('/login')
+            return
+        }
         if (isLiked) {
             setLikes(prev => {
                 const newLikes = prev.filter(id => id != userId)
@@ -120,12 +126,13 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
                     </div>
                 </footer>
                 <SmallModal position={'right-2'} isOpen={isOptionOpen} onClose={closeOptionModal} >
-                    <div className='p-3 '>
-                        <div onClick={handleDeleteTweet} className='flex gap-2 items-center text-red-600'><MdDelete /> Delete Tweet</div>
+                    <div className='py-2 space-y-3 '>
+                        {isAdmin && <div onClick={handleDeleteTweet} className='hover:bg-gray-200 px-2 rounded flex gap-2 items-center text-red-600'><MdDelete /> Delete Tweet</div>}
+                        <div className='hover:bg-gray-200 px-2 rounded flex gap-2 items-center text-twitter-100'><IoIosShareAlt /> Share Tweet</div>
                     </div>
                 </SmallModal>
             </div>
-            <ReplyModal isOpen={isReplyModalOpen} isTweetOpen={isTweetOpen} isReply={tweet.isReply} setReplies={setReplies} closeModal={closeReplyModal} tweet={tweet} />
+            {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} isTweetOpen={isTweetOpen} isReply={tweet.isReply} setReplies={setReplies} closeModal={closeReplyModal} tweet={tweet} />}
         </>
     )
 }

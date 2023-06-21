@@ -4,10 +4,12 @@ import { useAuth } from '../../Context/auth.context'
 import { AiFillApple } from 'react-icons/ai'
 import { FcGoogle } from 'react-icons/fc'
 import { useAlert } from '../../Context/alert.context'
+import { useNavigate } from 'react-router-dom'
 
 const Signup = () => {
     const { SignUpWithGoogle } = useAuth()
     const { showAlert } = useAlert()
+    const navigate = useNavigate()
     return (
         <div>
             <div className='border-[1px] rounded-xl p-4'>
@@ -18,7 +20,7 @@ const Signup = () => {
                 <div className='space-y-3'>
                     <button onClick={SignUpWithGoogle} className='flex items-center justify-center gap-2 bg-white hover:bg-gray-200 border-[1px]   rounded-full py-2 px-3 w-full'> <FcGoogle className='text-xl' /> Sign up with Google</button>
                     <button onClick={() => showAlert('Comming Soon 😊.', 'info')} className='flex items-center justify-center gap-2 bg-white hover:bg-gray-200 border-[1px]    rounded-full py-2 px-3 w-full'> <AiFillApple className='text-xl' /> Sign up with Apple</button>
-                    <button className='bg-white hover:bg-gray-200 border-[1px]   rounded-full py-2 px-3 w-full'>Create account</button>
+                    <button onClick={() => navigate('/signup')} className='bg-white hover:bg-gray-200 border-[1px]   rounded-full py-2 px-3 w-full'>Create account</button>
                 </div>
                 <p className='text-xs text-gray-600 mt-2'>
                     By signing up, you agree to the <span className='text-blue-600'>Terms of Service</span> and <span className='text-blue-600'>Privacy Policy</span>, including <span className='text-blue-600'>Cookie Use.</span>

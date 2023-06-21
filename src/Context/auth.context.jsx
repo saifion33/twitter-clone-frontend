@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
 import React, { createContext, useContext, useState } from 'react'
-import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
+import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth'
 import { auth } from '../firebase/firebase'
 import { useAlert } from './alert.context'
+import { useNavigate } from 'react-router-dom'
 
 const authContext = createContext(null)
 
@@ -10,8 +11,9 @@ const AuthContext = ({ children }) => {
     const [loggedInUser, setLoggedInUser] = useState(localStorage.getItem('loggedInUser') ? JSON.parse(localStorage.getItem('loggedInUser')) : { user: null, loading: false, error: null })
     const baseUrl = 'http://localhost:5000'
     const [signInGoogle] = useSignInWithGoogle(auth)
+    const [CreateAccount] = useCreateUserWithEmailAndPassword(auth)
     const { showAlert } = useAlert()
-
+    const navigate = useNavigate()
     // ** SIGN UP WITH GOOGLE
     const SignUpWithGoogle = async () => {
         setLoggedInUser({ ...loggedInUser, loading: true })
@@ -38,6 +40,7 @@ const AuthContext = ({ children }) => {
                             localStorage.setItem('loggedInUser', JSON.stringify(newState))
                             return newState
                         });
+                        navigate('/')
                         showAlert('Signup successfully .', 'success')
                     })
                     .catch(err => {
@@ -80,6 +83,7 @@ const AuthContext = ({ children }) => {
                             localStorage.setItem('loggedInUser', JSON.stringify(newState))
                             return newState
                         })
+                        navigate('/')
                         showAlert('SignIn Successfully .', 'success')
                     })
                     .catch((error) => {
@@ -94,15 +98,52 @@ const AuthContext = ({ children }) => {
                     })
             })
             .catch((err) => {
-                console.log(err); showAlert('Signup Successfully .', 'danger')
+                console.log(err); showAlert('SignIn failed  .', 'danger')
             })
+    }
+    const SignUpWithEmailAndPassword = (name, email, password) => {
+        CreateAccount(email, password).then((googleResponse) => {
+            console.log(googleResponse)
+            const body = JSON.stringify({
+                name,
+                id: googleResponse.user.uid,
+                email: googleResponse._tokenResponse.email,
+                userName: googleResponse._tokenResponse.email.split('@')[0],
+                avatarUrl: googleResponse._tokenResponse.photoUrl
+            })
+            const method = 'POST'
+            const headers = { 'Content-Type': 'application/json' }
+            fetch(`${baseUrl}/newUser`, { method, headers, body })
+                .then(response => response.json())
+                .then(response => {
+                    setLoggedInUser(prev => {
+                        const newState = { ...prev, user: response.data, loading: false }
+                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                        return newState
+                    });
+                    navigate('/')
+                    showAlert('Signup successfully .', 'success')
+                })
+                .catch(err => {
+                    console.log(err);
+                    setLoggedInUser(prev => {
+                        const newState = { ...prev, error: err }
+                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                        return newState
+                    });
+                    showAlert(`Signup Failed ${err.message}`, 'danger')
+                })
+        }).catch(err => {
+            console.log(err);
+            showAlert('Signup Failed. ' + err.message, 'danger')
+        })
     }
 
 
 
 
     return (
-        <authContext.Provider value={{ auth, SignUpWithGoogle, SignInWithGoogle, getLoggedInUser, loggedInUser, setLoggedInUser }} >
+        <authContext.Provider value={{ auth, SignUpWithGoogle, SignInWithGoogle, getLoggedInUser, loggedInUser, setLoggedInUser, SignUpWithEmailAndPassword }} >
             {children}
         </authContext.Provider>
     )
