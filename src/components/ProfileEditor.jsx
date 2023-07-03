@@ -84,6 +84,7 @@ const ProfileEditor = () => {
           throw new Error(message)
         })
         .then(res => {
+
           setLoggedInUser(prev => {
             const updatedUser = { ...prev, user: res.data }
             localStorage.setItem('loggedInUser', JSON.stringify(updatedUser))
@@ -130,9 +131,9 @@ const ProfileEditor = () => {
           <p className='text-lg font-semibold'>Edit Profile</p>
           <button type='submit' onClick={formik.handleSubmit} className='bg-black text-white rounded-full px-3 text-lg'>Save</button>
         </header>
-        <section className='overflow-y-auto' >
+        <section className='overflow-y-auto  w-[612px]' >
           <div className='relative'>
-            <div className='bg-gray-200 w-full h-44 flex justify-center items-center'>
+            <div className='bg-gray-200  w-full h-44 flex justify-center items-center'>
               <div className='relative flex justify-center items-center '>
                 <div className='absolute flex items-center gap-5'>
                   <div className='p-2 rounded-full bg-black bg-opacity-50 cursor-pointer '>
@@ -142,7 +143,7 @@ const ProfileEditor = () => {
                   {selectedBanner && <AiFillCloseCircle onClick={() => setSelectedBanner(null)} className=' bg-white rounded-full text-gray-700 text-3xl cursor-pointer' />}
                 </div>
                 {(!selectedBanner && loggedInUser.user.bannerUrl) && <img src={loggedInUser.user.bannerUrl} alt='banner' />}
-                {selectedBanner && <AvatarEditor ref={bannerRef} border={1} height={176} width={575} image={selectedBanner} scale={1} />}
+                {selectedBanner && <AvatarEditor ref={bannerRef} border={1} height={176} width={612} image={selectedBanner} scale={1} />}
               </div>
             </div>
             <div className='border-[6px] flex justify-center items-center p-1 cursor-pointer border-white bg-gray-200 rounded-full absolute -bottom-14 left-10'>
@@ -177,7 +178,9 @@ const ProfileEditor = () => {
         </section>
       </div>}
       {
-        isUpdating && <Loadingbar />
+        isUpdating && <div className='min-w-[612px]'>
+          <Loadingbar />
+        </div>
       }
     </>
   )
