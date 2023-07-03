@@ -21,11 +21,8 @@ import Tweet from './components/Tweet/Tweet'
 import LoginPage from './LoginPage'
 import SignupPage from './SignupPage'
 
-
-
 function App() {
   const [user] = useAuthState(auth)
-
   return (
     <>
       <div className='app flex'>
@@ -39,7 +36,7 @@ function App() {
             <Route path='/messages' element={<Messages />} />
             <Route path='/explore' element={<Explore />} />
             <Route path='/setting' element={<Setting />} />
-            <Route path='/profile' element={<Profile />} />
+            <Route path='/profile/:userId' element={<Profile />} />
             <Route path='/lists' element={<Lists />} />
             <Route path='/more' element={<More />} />
             <Route path='/tweet/:id' element={<Tweet />} />

@@ -10,17 +10,22 @@ import { getDownloadURL, ref } from "firebase/storage"
 import { useAuth } from "../../Context/auth.context"
 import { useAlert } from "../../Context/alert.context"
 import { useTweets } from "../../Context/tweet.context"
+import { API_BASE_URL } from "../../utils/helpers"
 
 
 
 const Tweet = () => {
+    const token = JSON.parse(localStorage.getItem('token'))
+    const [isTweetOpen, setIsTweetOpen] = useState(false)
     const navigate = useNavigate()
+    const { increaseTweetReplyCount } = useTweets()
+    const [replies, setReplies] = useState(null)
+    const [uploadImage] = useUploadFile(auth)
+    const [tweet, setTweet] = useState(null)
+    const { loggedInUser } = useAuth()
     const { showAlert } = useAlert()
     const { id } = useParams()
-    const [isTweetOpen, setIsTweetOpen] = useState(false)
-    const { increaseTweetReplyCount } = useTweets()
-    const [tweet, setTweet] = useState(null)
-    const [replies, setReplies] = useState(null)
+
     useEffect(() => {
         const tweet = JSON.parse(sessionStorage.getItem('tweet'))
         setTweet(tweet)
@@ -28,8 +33,8 @@ const Tweet = () => {
         setReplies(replies)
         setIsTweetOpen(tweet._id)
     }, [id])
-    const [uploadImage] = useUploadFile(auth)
-    const { loggedInUser } = useAuth()
+
+    // upload image
     const handleImageUpload = async (image) => {
         try {
             const result = await uploadImage(ref(storage, `/images/${loggedInUser.user.id}/${Date.now() + image.name}`), image, { cacheControl: `public , max-age=${3600 * 24 * 3}` });
@@ -40,10 +45,12 @@ const Tweet = () => {
             return null
         }
     }
+
+    // handle reply
     const handleReply = async (replyTweet, imageUrl, user) => {
-        const baseUrl = 'http://localhost:5000'
+
         try {
-            const response = await fetch(`${baseUrl}/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
+            const response = await fetch(`${API_BASE_URL}/tweet/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
             const newReply = await response.json()
             setReplies(prev => {
                 const newReplies = [...prev, newReply.data]
@@ -60,25 +67,38 @@ const Tweet = () => {
 
 
     }
+
+    // on back button click
     const returnHandler = () => {
         sessionStorage.removeItem('replies')
         sessionStorage.removeItem('tweet')
         navigate('/')
     }
+
+    // delete reply
     const deleteReply = (replyId) => {
-        fetch(`http://localhost:5000/deleteReply/${tweet._id}/${replyId}`, { method: 'DELETE' })
-            .then(res => res.json())
+
+        fetch(`${API_BASE_URL}/reply/delete/${tweet._id}/${replyId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
+            .then(res => {
+                if (res.ok) {
+                    return res.json()
+                }
+                throw new Error(res.status)
+            })
             .then(() => {
                 setReplies(prev => {
                     const newReplies = prev.filter(reply => reply._id !== replyId)
                     sessionStorage.setItem('replies', JSON.stringify(newReplies));
-
                     return newReplies
                 })
                 showAlert('Deleted Reply successfully. ', 'success')
             })
+            .catch(err => {
+                console.log(err)
+                showAlert('There was an error')
+            })
     }
-    
+
     return (
         <div key={id}>
             <div className="sticky z-10 top-0 left-0 flex gap-5 p-4 bg-white shadow-md">

@@ -9,6 +9,7 @@ import { auth, storage } from '../../firebase/firebase'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { useAuth } from '../../Context/auth.context'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../../utils/helpers'
 
 const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
     const { loggedInUser } = useAuth()
@@ -31,9 +32,12 @@ const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
         }
     }
     const handleReply = async (replyTweet, imageUrl, user) => {
-        const baseUrl = 'http://localhost:5000'
+        const token = JSON.parse(localStorage.getItem('token'));
         try {
-            const response = await fetch(`${baseUrl}/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
+            const response = await fetch(`${API_BASE_URL}/tweet/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
+            if (!response.ok) {
+                throw new Error('There was an error')
+            }
             const newReply = await response.json()
             if (tweet.replyOf && isTweetOpen == tweet._id) {
                 setReplies(prev => {

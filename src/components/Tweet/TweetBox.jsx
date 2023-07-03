@@ -50,23 +50,17 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) 
 
     const handleTweet = async () => {
         setTweetPosting(true)
-        const user = {
-            name: loggedInUser.user.name,
-            userName: loggedInUser.user.userName,
-            id: loggedInUser.user.id,
-            avatarUrl: loggedInUser.user.avatarUrl
-        }
+
         if (image) {
-            
             // First upload the image and get image url then post tweet to database
             handleImageUpload(image).then(async (imageUrl) => {
-                handleSubmit(tweet, imageUrl, user).finally(() => setTweetPosting(false));
+                handleSubmit(tweet, imageUrl, loggedInUser.user).finally(() => setTweetPosting(false));
             })
         }
         else {
 
             // Post tweet to database
-            handleSubmit(tweet, null, user).finally(() => setTweetPosting(false));
+            handleSubmit(tweet, null, loggedInUser.user).finally(() => setTweetPosting(false));
         }
         setTweet('')
         setImage(null)
@@ -126,9 +120,9 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) 
             {
                 (image && !tweetPosting) && <div className='relative'>
                     <div onClick={() => { setImage(null) }} className='absolute top-5 left-5 text-3xl p-2 rounded-full bg-gray-200 cursor-pointer hover:text-red-600 hover:bg-gray-100'>
-                        <MdOutlineClose/>
+                        <MdOutlineClose />
                     </div>
-                    <img className='' src={renderImage} alt="user selected image"/>
+                    <img className='' src={renderImage} alt="user selected image" />
                 </div>
             }
             {

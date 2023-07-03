@@ -21,6 +21,7 @@ import TweetBox from '../Tweet/TweetBox'
 import { useUploadFile } from 'react-firebase-hooks/storage'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { useTweets } from '../../Context/tweet.context'
+import { API_BASE_URL } from '../../utils/helpers'
 
 
 
@@ -54,9 +55,15 @@ const Sidebar = () => {
         }
     }
     const handleTweet = async (tweet, imageUrl, user) => {
-        const baseUrl = 'http://localhost:5000'
+        const token = JSON.parse(localStorage.getItem('token'));
         try {
-            const response = await fetch(`${baseUrl}/tweet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweet, imageUrl, user }) })
+            const response = await fetch(`${API_BASE_URL}/tweet/post`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
+            if (response.status === 401) {
+                signOut().then(() => {
+                    navigate('/login')
+                })
+                return
+            }
             const newTweet = await response.json()
             pushTweet(newTweet.data)
             closeTweetModal()
@@ -82,8 +89,8 @@ const Sidebar = () => {
                 <CustomNavLink to={'/messages'}><HiOutlineEnvelope />Messages</CustomNavLink>
                 <CustomNavLink to={'/lists'}><RiFileListLine />Lists</CustomNavLink>
                 <CustomNavLink to={'/bookmarks'}><RiBookmarkLine />Bookmarks</CustomNavLink>
-                <CustomNavLink active to={'/profile'}><FaRegUser />Profile</CustomNavLink>
-                <CustomNavLink active to={'/more'}><HiOutlineDotsCircleHorizontal />More</CustomNavLink></div>}
+                <div onClick={() => sessionStorage.setItem('user', JSON.stringify(loggedInUser))}><CustomNavLink to={`/profile/${loggedInUser.user && loggedInUser.user.id}`}><FaRegUser />Profile</CustomNavLink></div>
+                <CustomNavLink to={'/more'}><HiOutlineDotsCircleHorizontal />More</CustomNavLink></div>}
             {
                 (user && !loading) && <div className='tweet-button-container text-center p-4'>
                     <button onClick={openTweetModal} className='bg-twitter-100 w-full py-2 px-4 rounded-full text-xl text-white font-semibold hover:bg-sky-600'>Tweet</button>

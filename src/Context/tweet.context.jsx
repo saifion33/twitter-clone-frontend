@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { API_BASE_URL } from '../utils/helpers'
 const tweetContext = createContext(null)
 const TweetContext = ({ children }) => {
     const [tweets, setTweets] = useState({ tweets: null, loading: false })
     useEffect(() => {
         setTweets(() => { return { tweets: null, loading: true } })
-        fetch('http://localhost:5000/allTweets')
+        fetch(`${API_BASE_URL}/tweet/allTweets`)
             .then((response) => response.json())
             .then(response => {
                 setTweets(prev => { return { ...prev, tweets: response.data } })
@@ -31,7 +32,7 @@ const TweetContext = ({ children }) => {
         })
     }
     return (
-        <tweetContext.Provider value={{ tweets, setTweets,increaseTweetReplyCount,pushTweet }} >
+        <tweetContext.Provider value={{ tweets, setTweets, increaseTweetReplyCount, pushTweet }} >
             {children}
         </tweetContext.Provider>
     )
