@@ -14,7 +14,7 @@ import Popover from '../Popover'
 
 const MAX_FILE_SIZE = 1024 * 1024 * 2  //Max file size 2MB
 
-const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) => {
+const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit, id }) => {
     const [tweet, setTweet] = useState('')
     const [tweetPosting, setTweetPosting] = useState(false)
     const [renderImage, setRenderImage] = useState(null)
@@ -28,10 +28,9 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) 
     }
 
     const handleFileSelect = (e) => {
-
         const selectedImage = e.target.files[0]
         setImage(selectedImage)
-
+        console.log(selectedImage)
         if (selectedImage.size > MAX_FILE_SIZE) {
             setImage(null)
             console.log('Please select a file less than 2MB.')
@@ -46,6 +45,7 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) 
         if (selectedImage) {
             reader.readAsDataURL(selectedImage);
         }
+
     }
 
     const handleTweet = async () => {
@@ -54,17 +54,25 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) 
         if (image) {
             // First upload the image and get image url then post tweet to database
             handleImageUpload(image).then(async (imageUrl) => {
-                handleSubmit(tweet, imageUrl, loggedInUser.user).finally(() => setTweetPosting(false));
+                handleSubmit(tweet, imageUrl, loggedInUser.user).finally(() => {
+                    setTweetPosting(false)
+                    setTweet('')
+                    setImage(null)
+                    setRenderImage(null)
+                });
             })
         }
         else {
 
             // Post tweet to database
-            handleSubmit(tweet, null, loggedInUser.user).finally(() => setTweetPosting(false));
+            handleSubmit(tweet, null, loggedInUser.user).finally(() => {
+                setTweetPosting(false)
+                setTweet('')
+                setImage(null)
+                setRenderImage(null)
+            });
         }
-        setTweet('')
-        setImage(null)
-        setRenderImage(null)
+
     }
 
     return (
@@ -82,8 +90,8 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) 
                             <div className='flex gap-4 text-xl text-twitter-100   '>
                                 <div className=' cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
                                     <Popover message={'image'}>
-                                        <label className='cursor-pointer' htmlFor="fileInput"><BsCardImage /></label>
-                                        <input className='hidden' type="file" name="fileInput" onChange={handleFileSelect} accept='image/*' id="fileInput" />
+                                        <label className='cursor-pointer' htmlFor={id}><BsCardImage /></label>
+                                        <input className='hidden' type="file" name="fileInput" onChange={handleFileSelect} accept='image/*' id={id} />
                                     </Popover>
                                 </div>
                                 <div onClick={() => showAlert('Comming Soon... 😊')} className='cursor-pointer p-2 rounded-full hover:bg-twitter-25 transition-colors duration-300'>
@@ -119,7 +127,7 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit }) 
             }
             {
                 (image && !tweetPosting) && <div className='relative'>
-                    <div onClick={() => { setImage(null) }} className='absolute top-5 left-5 text-3xl p-2 rounded-full bg-gray-200 cursor-pointer hover:text-red-600 hover:bg-gray-100'>
+                    <div onClick={() => { setImage(null); setRenderImage(null) }} className='absolute top-5 left-5 text-3xl p-2 rounded-full bg-gray-200 cursor-pointer hover:text-red-600 hover:bg-gray-100'>
                         <MdOutlineClose />
                     </div>
                     <img className='' src={renderImage} alt="user selected image" />

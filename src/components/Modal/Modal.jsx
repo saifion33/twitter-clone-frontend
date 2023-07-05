@@ -8,7 +8,7 @@ const Modal = ({ isOpen, onClose, height, children }) => {
     return (
         <>
             {
-                isOpen && createPortal(<ModalBody height={height} onClose={onClose}>{children}</ModalBody>, document.body)
+                isOpen && createPortal(<ModalBody height={height} onClose={onClose}>{children}</ModalBody>, document.getElementById('portals'))
             }
         </>
     )

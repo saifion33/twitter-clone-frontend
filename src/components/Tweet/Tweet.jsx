@@ -11,6 +11,7 @@ import { useAuth } from "../../Context/auth.context"
 import { useAlert } from "../../Context/alert.context"
 import { useTweets } from "../../Context/tweet.context"
 import { API_BASE_URL } from "../../utils/helpers"
+import Loadingbar from "../Loadingbar"
 
 
 
@@ -25,13 +26,24 @@ const Tweet = () => {
     const { loggedInUser } = useAuth()
     const { showAlert } = useAlert()
     const { id } = useParams()
-
+    const [loading, setLoading] = useState(false)
+    const getData = () => {
+        const getTweet = fetch(`${API_BASE_URL}/tweet/getTweet/${id}`)
+        const getTweetReplies = fetch(`${API_BASE_URL}/tweet/gettweetreplies/${id}`)
+        setLoading(true)
+        Promise.all([getTweet, getTweetReplies]).then(res => {
+            const res1 = res[0]
+            const res2 = res[1]
+            return Promise.all([res1.json(), res2.json()])
+        }).then((res) => {
+            setTweet(res[0].data)
+            setIsTweetOpen(res[0].data._id)
+            setReplies(res[1].data)
+        }).finally(() => setLoading(false))
+    }
     useEffect(() => {
-        const tweet = JSON.parse(sessionStorage.getItem('tweet'))
-        setTweet(tweet)
-        const replies = JSON.parse(sessionStorage.getItem('replies'))
-        setReplies(replies)
-        setIsTweetOpen(tweet._id)
+        getData()
+
     }, [id])
 
     // upload image
@@ -101,17 +113,25 @@ const Tweet = () => {
 
     return (
         <div key={id}>
-            <div className="sticky z-10 top-0 left-0 flex gap-5 p-4 bg-white shadow-md">
-                <MdOutlineArrowBack onClick={returnHandler} className="text-2xl cursor-pointer" />
-                <p>Tweet</p>
-            </div>
-            {tweet && <TweetCard setReplies={setReplies} isTweetOpen={isTweetOpen} tweet={tweet} />}
-            {tweet && <TweetBox buttonText={'Reply'} placeholder={'Reply your tweet '} handleImageUpload={handleImageUpload} handleSubmit={handleReply} />}
-            <div className="ml-4 border-l-2 pl-4">
-                {(replies) && replies.map(reply => <TweetCard setReplies={setReplies} deleteTweet={deleteReply} key={reply._id} tweet={reply} />)}
-                {(replies && replies.length == 0) && <div>No replies</div>}
-            </div>
-
+            {
+                (!loading && tweet) && <div>
+                    <div className="sticky z-10 top-0 left-0 flex gap-5 p-4 bg-white shadow-md">
+                        <MdOutlineArrowBack onClick={returnHandler} className="text-2xl cursor-pointer" />
+                        <p>Tweet</p>
+                    </div>
+                    <TweetCard setReplies={setReplies} isTweetOpen={isTweetOpen} tweet={tweet} />
+                    <TweetBox id={'tweet-box-reply'} buttonText={'Reply'} placeholder={'Reply your tweet '} handleImageUpload={handleImageUpload} handleSubmit={handleReply} />
+                    <div className="ml-4 border-l-2 pl-4">
+                        {(replies) && replies.map(reply => <TweetCard setReplies={setReplies} deleteTweet={deleteReply} key={reply._id} tweet={reply} />)}
+                        {(replies && replies.length == 0) && <div>No replies</div>}
+                    </div>
+                </div>
+            }
+            {
+                loading && <div className="w-full h-full flex justify-center items-center">
+                    <Loadingbar />
+                </div>
+            }
         </div>
     )
 }

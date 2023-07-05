@@ -89,7 +89,7 @@ const Sidebar = () => {
                 <CustomNavLink to={'/messages'}><HiOutlineEnvelope />Messages</CustomNavLink>
                 <CustomNavLink to={'/lists'}><RiFileListLine />Lists</CustomNavLink>
                 <CustomNavLink to={'/bookmarks'}><RiBookmarkLine />Bookmarks</CustomNavLink>
-                <div onClick={() => sessionStorage.setItem('user', JSON.stringify(loggedInUser))}><CustomNavLink to={`/profile/${loggedInUser.user && loggedInUser.user.id}`}><FaRegUser />Profile</CustomNavLink></div>
+                <CustomNavLink to={`/profile/${loggedInUser.user && loggedInUser.user.id}`}><FaRegUser />Profile</CustomNavLink>
                 <CustomNavLink to={'/more'}><HiOutlineDotsCircleHorizontal />More</CustomNavLink></div>}
             {
                 (user && !loading) && <div className='tweet-button-container text-center p-4'>
@@ -108,7 +108,7 @@ const Sidebar = () => {
                         {loggedInUser.user && <p className='text-slate-600'>@{loggedInUser?.user?.userName}</p>}
                     </div>
                     <HiDotsHorizontal className='text-2xl ml-auto' onClick={openModal} />
-                    <SmallModal isOpen={isOpen} onClose={closeModal} >
+                    <SmallModal isOpen={isOpen} onClose={closeModal} position={'-top-10'} >
                         <div className='text-base p-4'>
                             <button onClick={handleSignOut} className='bg-twitter-100 rounded-full text-white py-1 px-3 hover:bg-twitter-75 '>logOut {loggedInUser.user.name}</button>
                         </div>

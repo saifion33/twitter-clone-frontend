@@ -33,10 +33,6 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
 
     }
     const openTweet = async () => {
-        sessionStorage.setItem('tweet', JSON.stringify(tweet))
-        const response = await fetch(`${API_BASE_URL}/tweet/gettweetreplies/${tweet._id}`)
-        const replies = await response.json()
-        sessionStorage.setItem('replies', JSON.stringify(replies.data))
         navigate(`/tweet/${tweet._id}`, { relative: 'path' })
     }
     const handleDeleteTweet = () => {
@@ -85,7 +81,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         sessionStorage.setItem('user', JSON.stringify({ loading: false, user: tweet.user, error: null }))
         navigate(`/profile/${tweet.user.id}`)
     }
-    console.log(tweet.postedOn)
+
     return (
         <>
             <div className='p-6 cursor-pointer hover:bg-gray-100 relative '>

@@ -81,10 +81,10 @@ const Home = () => {
   }
   return (
     <div>
-      <div>
-        {user && <TweetBox key={user.uid} buttonText={'Tweet'} handleImageUpload={handleImageUpload} handleSubmit={handleTweet} placeholder={"What's happning "} />}
-        {loading && <Loadingbar height='10' width='10' />}
-      </div>
+      {
+        user && <TweetBox handleImageUpload={handleImageUpload} handleSubmit={handleTweet} id={'tweet-home'} buttonText={'Tweet'} placeholder={"What's happning?!"} />
+      }
+      {loading && <Loadingbar height='10' width='10' />}
       <div>
         {tweets.loading && <Loadingbar />}
         {

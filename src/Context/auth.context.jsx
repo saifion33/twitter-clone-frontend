@@ -118,21 +118,22 @@ const AuthContext = ({ children }) => {
                 console.log(err); showAlert('SignIn failed  .', 'danger')
             })
     }
-    const SignUpWithEmailAndPassword = async(name, email, password) => {
+    const SignUpWithEmailAndPassword = async (name, email, password) => {
         CreateAccount(email, password).then((googleResponse) => {
             console.log(googleResponse)
             const body = JSON.stringify({
                 name,
                 id: googleResponse.user.uid,
-                email: googleResponse._tokenResponse.email,
-                userName: googleResponse._tokenResponse.email.split('@')[0],
-                avatarUrl: googleResponse._tokenResponse.photoUrl
+                email: googleResponse.user.email,
+                userName: googleResponse.user.email.split('@')[0],
+                avatarUrl: googleResponse.user.photoURL
             })
             const method = 'POST'
             const headers = { 'Content-Type': 'application/json' }
             fetch(`${API_BASE_URL}/auth/signup`, { method, headers, body })
                 .then(response => response.json())
                 .then(response => {
+
                     setLoggedInUser(prev => {
                         localStorage.setItem('token', JSON.stringify(response.data.token));
                         const newState = { ...prev, user: response.data.user, loading: false }
@@ -158,15 +159,14 @@ const AuthContext = ({ children }) => {
     }
     const signInWithEmailAndPassword = async (email, password) => {
         const googleResponse = await signInWithEmail(email, password)
-        console.log(googleResponse)
         if (!googleResponse) {
             return showAlert(`Signin Failed. May you don't have an account`, 'danger')
         }
         login(googleResponse.user.email, googleResponse.user.uid)
             .then(response => {
-                localStorage.setItem('token', JSON.stringify(response.data.token))
+                localStorage.setItem('token', JSON.stringify(response.data.data.token))
                 setLoggedInUser(prev => {
-                    const newState = { ...prev, user: response.data.user, loading: false }
+                    const newState = { ...prev, user: response.data.data.user, loading: false }
                     localStorage.setItem('loggedInUser', JSON.stringify(newState))
                     return newState
                 })
@@ -185,10 +185,6 @@ const AuthContext = ({ children }) => {
             })
 
     }
-
-
-
-
 
     return (
         <authContext.Provider value={{ auth, SignUpWithGoogle, SignInWithGoogle, login, loggedInUser, setLoggedInUser, SignUpWithEmailAndPassword, signInWithEmailAndPassword }} >

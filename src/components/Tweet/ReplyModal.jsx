@@ -74,8 +74,8 @@ const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
                     <p className='text-gray-400'>Replying to <span className='text-twitter-100 cursor-pointer'>@{tweet.user.userName}</span></p>
                 </div>
             </div>
-            <div>
-                <TweetBox key={tweet._id} handleImageUpload={handleImageUpload} handleSubmit={handleReply} buttonText={'Reply'} placeholder={'Tweet your Reply! '} />
+            <div className=''>
+                <TweetBox id={'reply-box'} handleImageUpload={handleImageUpload} handleSubmit={handleReply} buttonText={'Reply'} placeholder={'Tweet your Reply! '} />
             </div>
         </Modal>
     )
