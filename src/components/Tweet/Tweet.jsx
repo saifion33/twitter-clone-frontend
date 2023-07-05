@@ -9,7 +9,6 @@ import { auth, storage } from "../../firebase/firebase"
 import { getDownloadURL, ref } from "firebase/storage"
 import { useAuth } from "../../Context/auth.context"
 import { useAlert } from "../../Context/alert.context"
-import { useTweets } from "../../Context/tweet.context"
 import { API_BASE_URL } from "../../utils/helpers"
 import Loadingbar from "../Loadingbar"
 
@@ -19,7 +18,6 @@ const Tweet = () => {
     const token = JSON.parse(localStorage.getItem('token'))
     const [isTweetOpen, setIsTweetOpen] = useState(false)
     const navigate = useNavigate()
-    const { increaseTweetReplyCount } = useTweets()
     const [replies, setReplies] = useState(null)
     const [uploadImage] = useUploadFile(auth)
     const [tweet, setTweet] = useState(null)
@@ -62,7 +60,7 @@ const Tweet = () => {
     const handleReply = async (replyTweet, imageUrl, user) => {
 
         try {
-            const response = await fetch(`${API_BASE_URL}/tweet/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
+            const response = await fetch(`${API_BASE_URL}/tweet/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
             const newReply = await response.json()
             setReplies(prev => {
                 const newReplies = [...prev, newReply.data]
@@ -70,7 +68,7 @@ const Tweet = () => {
                 setTweet(prev => {
                     return { ...prev, replyCount: prev.replyCount + 1 }
                 })
-                increaseTweetReplyCount(tweet._id)
+
                 return newReplies
             })
         } catch (error) {
@@ -90,7 +88,7 @@ const Tweet = () => {
     // delete reply
     const deleteReply = (replyId) => {
 
-        fetch(`${API_BASE_URL}/reply/delete/${tweet._id}/${replyId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
+        fetch(`${API_BASE_URL}/tweet/delete/reply/${tweet._id}/${replyId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
             .then(res => {
                 if (res.ok) {
                     return res.json()
@@ -102,6 +100,9 @@ const Tweet = () => {
                     const newReplies = prev.filter(reply => reply._id !== replyId)
                     sessionStorage.setItem('replies', JSON.stringify(newReplies));
                     return newReplies
+                })
+                setTweet(prev => {
+                    return { ...prev, replyCount: prev.replyCount - 1 }
                 })
                 showAlert('Deleted Reply successfully. ', 'success')
             })
