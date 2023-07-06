@@ -11,6 +11,7 @@ import { useAlert } from '../../Context/alert.context'
 import { useAuth } from '../../Context/auth.context'
 import Loadingbar from '../Loadingbar'
 import Popover from '../Popover'
+import { useNavigate } from 'react-router-dom'
 
 const MAX_FILE_SIZE = 1024 * 1024 * 2  //Max file size 2MB
 
@@ -18,6 +19,7 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit, id
     const [tweet, setTweet] = useState('')
     const [tweetPosting, setTweetPosting] = useState(false)
     const [renderImage, setRenderImage] = useState(null)
+    const navigate = useNavigate()
     const [image, setImage] = useState(null)
     const { loggedInUser } = useAuth()
     const { showAlert } = useAlert()
@@ -49,6 +51,10 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit, id
     }
 
     const handleTweet = async () => {
+        if (!loggedInUser.user) {
+            navigate('/login')
+            return
+        }
         setTweetPosting(true)
 
         if (image) {

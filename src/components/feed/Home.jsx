@@ -88,7 +88,7 @@ const Home = () => {
       <div>
         {tweets.loading && <Loadingbar />}
         {
-          (tweets.tweets && tweets.tweets.length > 0 && !tweets.loading) && tweets.tweets.map((tweet) => <TweetCard deleteTweet={deleteTweet} tweet={tweet} key={tweet._id} />)
+          (tweets.tweets && tweets.tweets.length > 0 && !tweets.loading) && tweets.tweets.slice().reverse().map((tweet) => <TweetCard deleteTweet={deleteTweet} tweet={tweet} key={tweet._id} />)
         }
         {
           (tweets.tweets && tweets.tweets.length == 0) && <div className='text-4xl text-twitter-100 font-semibold text-center py-5'>No Tweets !</div>

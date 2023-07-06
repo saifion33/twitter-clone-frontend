@@ -1,30 +1,32 @@
 import React, { useEffect, useState } from "react"
 
-import { MdOutlineArrowBack } from "react-icons/md"
-import { useNavigate, useParams } from "react-router-dom"
-import TweetCard from "./TweetCard"
-import TweetBox from "./TweetBox"
 import { useUploadFile } from "react-firebase-hooks/storage"
+import { useNavigate, useParams } from "react-router-dom"
 import { auth, storage } from "../../firebase/firebase"
 import { getDownloadURL, ref } from "firebase/storage"
-import { useAuth } from "../../Context/auth.context"
 import { useAlert } from "../../Context/alert.context"
+import { useAuth } from "../../Context/auth.context"
+import { MdOutlineArrowBack } from "react-icons/md"
 import { API_BASE_URL } from "../../utils/helpers"
 import Loadingbar from "../Loadingbar"
+import TweetCard from "./TweetCard"
+import TweetBox from "./TweetBox"
 
 
 
 const Tweet = () => {
+
     const token = JSON.parse(localStorage.getItem('token'))
     const [isTweetOpen, setIsTweetOpen] = useState(false)
     const navigate = useNavigate()
+    const [loading, setLoading] = useState(false)
     const [replies, setReplies] = useState(null)
     const [uploadImage] = useUploadFile(auth)
     const [tweet, setTweet] = useState(null)
     const { loggedInUser } = useAuth()
     const { showAlert } = useAlert()
     const { id } = useParams()
-    const [loading, setLoading] = useState(false)
+
     const getData = () => {
         const getTweet = fetch(`${API_BASE_URL}/tweet/getTweet/${id}`)
         const getTweetReplies = fetch(`${API_BASE_URL}/tweet/gettweetreplies/${id}`)
@@ -80,8 +82,6 @@ const Tweet = () => {
 
     // on back button click
     const returnHandler = () => {
-        sessionStorage.removeItem('replies')
-        sessionStorage.removeItem('tweet')
         navigate('/')
     }
 
