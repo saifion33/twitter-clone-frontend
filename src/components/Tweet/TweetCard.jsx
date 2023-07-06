@@ -69,7 +69,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         }
         const url = `${API_ENDPOINTS.TWEET.LIKE_TWEET.URL}/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`
 
-        fetch(url, { method: API_ENDPOINTS.TWEET.LIKE_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ userId }) }).then((res) => {
+        fetch(url, { method: API_ENDPOINTS.TWEET.LIKE_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Accept': '*/*', 'Origin': 'http://localhost:5173/', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ userId }) }).then((res) => {
             if (!res.ok) {
                 throw new Error(res.status)
             }

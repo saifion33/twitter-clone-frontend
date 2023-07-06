@@ -36,7 +36,7 @@ const Home = () => {
   // TWEET
   const handleTweet = async (tweet, imageUrl, user) => {
     try {
-      const response = await fetch(API_ENDPOINTS.TWEET.POST_TWEET.URL, { method: API_ENDPOINTS.TWEET.POST_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
+      const response = await fetch(API_ENDPOINTS.TWEET.POST_TWEET.URL, { method: API_ENDPOINTS.TWEET.POST_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
       if (!response.ok) {
         throw new Error(response.status)
       }
@@ -63,7 +63,7 @@ const Home = () => {
       return
     }
     const tweetId = tweet._id
-    fetch(`${API_ENDPOINTS.TWEET.DELETE_TWEET.URL}/${tweetId}`, { method: API_ENDPOINTS.TWEET.DELETE_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
+    fetch(`${API_ENDPOINTS.TWEET.DELETE_TWEET.URL}/${tweetId}`, { method: API_ENDPOINTS.TWEET.DELETE_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` } })
       .then((res) => {
         if (res.ok) {
           return res.json()
@@ -102,7 +102,7 @@ const Home = () => {
           (!tweets.tweets && !tweets.loading && navigator.onLine) && <div className='text-2xl py-10 text-slate-600 font-semibold text-center'>Something went wrong...</div>
         }
         {
-          !navigator.onLine && <div className='flex flex-col justify-center items-center py-20 text-slate-500'>
+          (!navigator.onLine && !tweets.tweets) && <div className='flex flex-col justify-center items-center py-20 text-slate-500'>
             <BiWifiOff className='text-9xl' />
             <p className='text-2xl font-semibold'>Check your Internet</p>
           </div>

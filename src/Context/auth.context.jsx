@@ -24,7 +24,7 @@ const AuthContext = ({ children }) => {
             avatarUrl: googleResponse._tokenResponse.photoUrl
         })
         const method = API_ENDPOINTS.AUTH.SIGNUP.METHOD
-        const headers = { 'Content-Type': 'application/json' }
+        const headers = { 'Content-Type': 'application/json', 'Authorization':`Basic ${btoa(import.meta.env.VITE_API_SECRET)}`}
         // ** REGISTER NEW USER IN DATABASE
         fetch(API_ENDPOINTS.AUTH.SIGNUP.URL, { method, headers, body })
             .then(response => response.json())
@@ -66,7 +66,7 @@ const AuthContext = ({ children }) => {
     }
     const login = async (email, id) => {
         try {
-            const response = await fetch(`${API_ENDPOINTS.AUTH.LOGIN.URL}/${email}/${id}`)
+            const response = await fetch(`${API_ENDPOINTS.AUTH.LOGIN.URL}/${email}/${id}`,{headers:{'content-type': 'application/json','Authorization': `${btoa(import.meta.env.VITE_API_SECRET)}`}})
             const data = await response.json();
             return { data, status: response.status }
         } catch (error) {
@@ -80,7 +80,7 @@ const AuthContext = ({ children }) => {
         setLoggedInUser({ ...loggedInUser, loading: true })
         signInGoogle()
             .then(async (googleResponse) => {
-                const isUserExist = await fetch(`${API_ENDPOINTS.AUTH.IS_USER_EXIST.URL}/${googleResponse.user.email}`)
+                const isUserExist = await fetch(`${API_ENDPOINTS.AUTH.IS_USER_EXIST.URL}/${googleResponse.user.email}`,{headers:{'content-type': 'application/json','Authorization':`${btoa(import.meta.env.VITE_API_SECRET)}`}})
                 if (isUserExist.ok) {
                     login(googleResponse.user.email, googleResponse.user.uid)
                         .then(response => {
@@ -128,7 +128,7 @@ const AuthContext = ({ children }) => {
                 avatarUrl: googleResponse.user.photoURL
             })
             const method = API_ENDPOINTS.AUTH.SIGNUP.METHOD
-            const headers = { 'Content-Type': 'application/json' }
+            const headers = { 'Content-Type': 'application/json','Authorization':`Basic ${btoa(import.meta.env.VITE_API_SECRET)}` }
             fetch(API_ENDPOINTS.AUTH.SIGNUP.URL, { method, headers, body })
                 .then(response => response.json())
                 .then(response => {

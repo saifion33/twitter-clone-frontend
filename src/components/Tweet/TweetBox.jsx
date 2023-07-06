@@ -29,10 +29,16 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit, id
         setTweet(e.target.value)
     }
 
+    const reset = () => {
+        setTweetPosting(false)
+        setTweet('')
+        setImage(null)
+        setRenderImage(null)
+    }
+
     const handleFileSelect = (e) => {
         const selectedImage = e.target.files[0]
         setImage(selectedImage)
-        console.log(selectedImage)
         if (selectedImage.size > MAX_FILE_SIZE) {
             setImage(null)
             console.log('Please select a file less than 2MB.')
@@ -60,27 +66,16 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit, id
             return
         }
         setTweetPosting(true)
-
         if (image) {
             // First upload the image and get image url then post tweet to database
             handleImageUpload(image).then(async (imageUrl) => {
-                handleSubmit(tweet, imageUrl, loggedInUser.user).finally(() => {
-                    setTweetPosting(false)
-                    setTweet('')
-                    setImage(null)
-                    setRenderImage(null)
-                });
+                handleSubmit(tweet, imageUrl, loggedInUser.user).finally(() => reset());
             })
         }
         else {
 
             // Post tweet to database
-            handleSubmit(tweet, null, loggedInUser.user).finally(() => {
-                setTweetPosting(false)
-                setTweet('')
-                setImage(null)
-                setRenderImage(null)
-            });
+            handleSubmit(tweet, null, loggedInUser.user).finally(() => reset());
         }
 
     }
@@ -130,7 +125,7 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit, id
                                     </Popover>
                                 </div>
                             </div>
-                            <button onClick={() => { handleTweet() }} disabled={tweet.length < 1} className='bg-twitter-100 rounded-full py-2 px-4 text-slate-200 disabled:bg-gray-500 font-semibold'>{buttonText}</button>
+                            <button onClick={() =>{handleTweet()}} disabled={tweet.length < 1} className='bg-twitter-100 rounded-full py-2 px-4 text-slate-200 disabled:bg-gray-500 font-semibold'>{buttonText}</button>
                         </div>
                     </div>
                 </div>

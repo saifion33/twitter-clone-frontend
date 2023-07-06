@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { API_BASE_URL } from '../utils/helpers'
+import { API_ENDPOINTS } from '../utils/helpers'
 const tweetContext = createContext(null)
 const TweetContext = ({ children }) => {
     const [tweets, setTweets] = useState({ tweets: null, loading: false })
     useEffect(() => {
         setTweets(() => { return { tweets: null, loading: true } })
-        fetch(`${API_BASE_URL}/tweet/allTweets`)
+        fetch(API_ENDPOINTS.TWEET.GET_ALL_TWEETS.URL, { headers: { 'content-type': 'application/json', 'Accept': '*/*', 'Origin': 'http://localhost:5173/', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)}` } })
             .then((response) => response.json())
             .then(response => {
                 setTweets(prev => { return { ...prev, tweets: response.data } })

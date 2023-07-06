@@ -61,7 +61,7 @@ const Sidebar = () => {
     const handleTweet = async (tweet, imageUrl, user) => {
         const token = JSON.parse(localStorage.getItem('token'));
         try {
-            const response = await fetch(API_ENDPOINTS.TWEET.POST_TWEET.URL, { method: API_ENDPOINTS.TWEET.POST_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
+            const response = await fetch(API_ENDPOINTS.TWEET.POST_TWEET.URL, { method: API_ENDPOINTS.TWEET.POST_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
             if (response.status === 401) {
                 signOut().then(() => {
                     navigate('/login')

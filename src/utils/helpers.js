@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:5000'
+export const API_BASE_URL = 'https://twitter-clone.cyclic.app'
 export const API_ENDPOINTS = {
     AUTH: {
         SIGNUP: { URL: `${API_BASE_URL}/auth/signup`, METHOD: 'POST' },

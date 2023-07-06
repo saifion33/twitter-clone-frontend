@@ -28,8 +28,8 @@ const Tweet = () => {
     const { id } = useParams()
 
     const getData = () => {
-        const getTweet = fetch(`${API_ENDPOINTS.TWEET.GET_TWEET_BY_ID.URL}/${id}`)
-        const getTweetReplies = fetch(`${API_ENDPOINTS.TWEET.GET_TWEET_REPLIES.URL}/${id}`)
+        const getTweet = fetch(`${API_ENDPOINTS.TWEET.GET_TWEET_BY_ID.URL}/${id}`, { headers: { 'content-type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)}` } })
+        const getTweetReplies = fetch(`${API_ENDPOINTS.TWEET.GET_TWEET_REPLIES.URL}/${id}`, { headers: { 'content-type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)}` } })
         setLoading(true)
         Promise.all([getTweet, getTweetReplies]).then(res => {
             const res1 = res[0]
@@ -67,7 +67,7 @@ const Tweet = () => {
     const handleReply = async (replyTweet, imageUrl, user) => {
 
         try {
-            const response = await fetch(`${API_ENDPOINTS.TWEET.REPLY_TWEET.URL}/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: API_ENDPOINTS.TWEET.REPLY_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
+            const response = await fetch(`${API_ENDPOINTS.TWEET.REPLY_TWEET.URL}/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: API_ENDPOINTS.TWEET.REPLY_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
             const newReply = await response.json()
             setReplies(prev => {
                 const newReplies = [...prev, newReply.data]
@@ -93,7 +93,7 @@ const Tweet = () => {
     // delete reply
     const deleteReply = (replyToDelete) => {
 
-        fetch(`${API_ENDPOINTS.TWEET.DELETE_REPLY.URL}/${tweet._id}/${replyToDelete._id}`, { method: API_ENDPOINTS.TWEET.DELETE_REPLY.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
+        fetch(`${API_ENDPOINTS.TWEET.DELETE_REPLY.URL}/${tweet._id}/${replyToDelete._id}`, { method: API_ENDPOINTS.TWEET.DELETE_REPLY.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` } })
             .then(res => {
                 if (res.ok) {
                     return res.json()

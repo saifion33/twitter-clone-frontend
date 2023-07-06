@@ -22,7 +22,7 @@ const Profile = () => {
   const getUser = (userId) => {
     setLoading(true)
     const token = JSON.parse(localStorage.getItem('token'))
-    fetch(`${API_ENDPOINTS.USER.GET_USER_BY_ID.URL}/${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
+    fetch(`${API_ENDPOINTS.USER.GET_USER_BY_ID.URL}/${userId}`, { headers: { 'content-type': 'application/json', 'Accept': '*/*', 'Origin': 'http://localhost:5173/', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` } })
       .then(res => {
         if (res.ok) {
           return res.json()
@@ -36,6 +36,11 @@ const Profile = () => {
       .finally(() => setLoading(false))
   }
   useEffect(() => {
+    if (!navigator.onLine) {
+      showAlert('Check you Internet connection.')
+      navigate('/')
+      return
+    }
     if (!loggedInUser.user) {
       navigate('/login')
       return
