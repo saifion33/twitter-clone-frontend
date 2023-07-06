@@ -23,6 +23,7 @@ import SignupPage from './SignupPage'
 
 function App() {
   const [user] = useAuthState(auth)
+
   return (
     <>
       <div className='app flex'>
