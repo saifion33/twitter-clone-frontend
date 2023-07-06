@@ -9,7 +9,8 @@ import { useUploadFile } from 'react-firebase-hooks/storage'
 import { getDownloadURL, ref, deleteObject } from 'firebase/storage'
 import { useAlert } from '../../Context/alert.context'
 import { useNavigate } from 'react-router-dom'
-import { API_BASE_URL } from '../../utils/helpers'
+import { API_ENDPOINTS } from '../../utils/helpers'
+import { BiWifiOff } from 'react-icons/bi'
 
 const Home = () => {
   const [user, loading] = useAuthState(auth)
@@ -35,7 +36,7 @@ const Home = () => {
   // TWEET
   const handleTweet = async (tweet, imageUrl, user) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/tweet/post`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
+      const response = await fetch(API_ENDPOINTS.TWEET.POST_TWEET.URL, { method: API_ENDPOINTS.TWEET.POST_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
       if (!response.ok) {
         throw new Error(response.status)
       }
@@ -57,8 +58,12 @@ const Home = () => {
 
   // handle Delete tweet
   const deleteTweet = (tweet) => {
+    if (!navigator.onLine) {
+      showAlert('Please check your Internet connection.')
+      return
+    }
     const tweetId = tweet._id
-    fetch(`${API_BASE_URL}/tweet/delete/${tweetId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
+    fetch(`${API_ENDPOINTS.TWEET.DELETE_TWEET.URL}/${tweetId}`, { method: API_ENDPOINTS.TWEET.DELETE_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
       .then((res) => {
         if (res.ok) {
           return res.json()
@@ -94,7 +99,13 @@ const Home = () => {
           (tweets.tweets && tweets.tweets.length == 0) && <div className='text-4xl text-twitter-100 font-semibold text-center py-5'>No Tweets !</div>
         }
         {
-          (!tweets.tweets && !tweets.loading) && <div className='text-2xl py-10 text-slate-600 font-semibold text-center'>Something went wrong...</div>
+          (!tweets.tweets && !tweets.loading && navigator.onLine) && <div className='text-2xl py-10 text-slate-600 font-semibold text-center'>Something went wrong...</div>
+        }
+        {
+          !navigator.onLine && <div className='flex flex-col justify-center items-center py-20 text-slate-500'>
+            <BiWifiOff className='text-9xl' />
+            <p className='text-2xl font-semibold'>Check your Internet</p>
+          </div>
         }
       </div>
     </div>

@@ -9,7 +9,7 @@ import ProfileEditor from '../ProfileEditor'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../Context/auth.context'
 import { useAlert } from '../../Context/alert.context'
-import { API_BASE_URL } from '../../utils/helpers'
+import { API_ENDPOINTS } from '../../utils/helpers'
 import Loadingbar from '../Loadingbar'
 
 const Profile = () => {
@@ -22,7 +22,7 @@ const Profile = () => {
   const getUser = (userId) => {
     setLoading(true)
     const token = JSON.parse(localStorage.getItem('token'))
-    fetch(`${API_BASE_URL}/user/userById/${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
+    fetch(`${API_ENDPOINTS.USER.GET_USER_BY_ID.URL}/${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
       .then(res => {
         if (res.ok) {
           return res.json()

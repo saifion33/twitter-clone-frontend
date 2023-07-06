@@ -4,7 +4,7 @@ import { useCreateUserWithEmailAndPassword, useSignInWithEmailAndPassword, useSi
 import { auth } from '../firebase/firebase'
 import { useAlert } from './alert.context'
 import { useNavigate } from 'react-router-dom'
-import { API_BASE_URL } from '../utils/helpers'
+import { API_ENDPOINTS } from '../utils/helpers'
 
 const authContext = createContext(null)
 
@@ -23,11 +23,10 @@ const AuthContext = ({ children }) => {
             userName: googleResponse._tokenResponse.email.split('@')[0],
             avatarUrl: googleResponse._tokenResponse.photoUrl
         })
-        const method = 'POST'
+        const method = API_ENDPOINTS.AUTH.SIGNUP.METHOD
         const headers = { 'Content-Type': 'application/json' }
-
         // ** REGISTER NEW USER IN DATABASE
-        fetch(`${API_BASE_URL}/auth/signup`, { method, headers, body })
+        fetch(API_ENDPOINTS.AUTH.SIGNUP.URL, { method, headers, body })
             .then(response => response.json())
             .then(response => {
                 console.log(response)
@@ -67,7 +66,7 @@ const AuthContext = ({ children }) => {
     }
     const login = async (email, id) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login/${email}/${id}`)
+            const response = await fetch(`${API_ENDPOINTS.AUTH.LOGIN.URL}/${email}/${id}`)
             const data = await response.json();
             return { data, status: response.status }
         } catch (error) {
@@ -81,7 +80,7 @@ const AuthContext = ({ children }) => {
         setLoggedInUser({ ...loggedInUser, loading: true })
         signInGoogle()
             .then(async (googleResponse) => {
-                const isUserExist = await fetch(`${API_BASE_URL}/auth/isUserExist/${googleResponse.user.email}`)
+                const isUserExist = await fetch(`${API_ENDPOINTS.AUTH.IS_USER_EXIST.URL}/${googleResponse.user.email}`)
                 if (isUserExist.ok) {
                     login(googleResponse.user.email, googleResponse.user.uid)
                         .then(response => {
@@ -128,9 +127,9 @@ const AuthContext = ({ children }) => {
                 userName: googleResponse.user.email.split('@')[0],
                 avatarUrl: googleResponse.user.photoURL
             })
-            const method = 'POST'
+            const method = API_ENDPOINTS.AUTH.SIGNUP.METHOD
             const headers = { 'Content-Type': 'application/json' }
-            fetch(`${API_BASE_URL}/auth/signup`, { method, headers, body })
+            fetch(API_ENDPOINTS.AUTH.SIGNUP.URL, { method, headers, body })
                 .then(response => response.json())
                 .then(response => {
 

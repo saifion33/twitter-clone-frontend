@@ -17,7 +17,7 @@ import SmallModal from '../Modal/SmallModal'
 import { MdDelete } from 'react-icons/md'
 import { useAuth } from '../../Context/auth.context'
 import { useAlert } from '../../Context/alert.context'
-import { API_BASE_URL } from '../../utils/helpers'
+import { API_ENDPOINTS } from '../../utils/helpers'
 
 const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
@@ -36,12 +36,20 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         navigate(`/tweet/${tweet._id}`, { relative: 'path' })
     }
     const handleDeleteTweet = () => {
-        deleteTweet(tweet._id)
+        if (!navigator.onLine) {
+            showAlert('Please check your Internet connection.')
+            return
+        }
+        deleteTweet(tweet)
     }
     const userId = loggedInUser.user && loggedInUser.user.id
     const isLiked = tweet.likes.includes(userId)
 
     const handleLikeTweet = () => {
+        if (!navigator.onLine) {
+            showAlert('Please check your Internet connection.')
+            return
+        }
         setAnimateClass('animate-bounce')
         setTimeout(() => {
             setAnimateClass('')
@@ -59,8 +67,9 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         else {
             tweet.likes.push(userId)
         }
-        const url = `${API_BASE_URL}/tweet/like/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`
-        fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ userId }) }).then((res) => {
+        const url = `${API_ENDPOINTS.TWEET.LIKE_TWEET.URL}/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`
+
+        fetch(url, { method: API_ENDPOINTS.TWEET.LIKE_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ userId }) }).then((res) => {
             if (!res.ok) {
                 throw new Error(res.status)
             }

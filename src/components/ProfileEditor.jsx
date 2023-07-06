@@ -9,7 +9,7 @@ import { AiFillCloseCircle } from 'react-icons/ai'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { storage } from '../firebase/firebase'
 import Loadingbar from './Loadingbar'
-import { API_BASE_URL } from '../utils/helpers'
+import { API_ENDPOINTS } from '../utils/helpers'
 import { useAlert } from '../Context/alert.context'
 
 const ProfileEditor = () => {
@@ -72,7 +72,7 @@ const ProfileEditor = () => {
         update.location = values.location
       }
       const token = JSON.parse(localStorage.getItem('token'))
-      fetch(`${API_BASE_URL}/user/updateuser/${loggedInUser.user.email}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ update }) })
+      fetch(`${API_ENDPOINTS.USER.UPDATE_USER.URL}/${loggedInUser.user.email}`, { method: API_ENDPOINTS.USER.UPDATE_USER.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ update }) })
         .then(res => {
           let message;
           if (res.ok) {

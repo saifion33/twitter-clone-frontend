@@ -51,6 +51,10 @@ const TweetBox = ({ placeholder, buttonText, handleImageUpload, handleSubmit, id
     }
 
     const handleTweet = async () => {
+        if (!navigator.onLine) {
+            showAlert('Please check your Internet connection.')
+            return
+        }
         if (!loggedInUser.user) {
             navigate('/login')
             return

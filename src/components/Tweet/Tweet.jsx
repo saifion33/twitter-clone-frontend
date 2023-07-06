@@ -7,7 +7,7 @@ import { getDownloadURL, ref } from "firebase/storage"
 import { useAlert } from "../../Context/alert.context"
 import { useAuth } from "../../Context/auth.context"
 import { MdOutlineArrowBack } from "react-icons/md"
-import { API_BASE_URL } from "../../utils/helpers"
+import { API_ENDPOINTS } from "../../utils/helpers"
 import Loadingbar from "../Loadingbar"
 import TweetCard from "./TweetCard"
 import TweetBox from "./TweetBox"
@@ -28,8 +28,8 @@ const Tweet = () => {
     const { id } = useParams()
 
     const getData = () => {
-        const getTweet = fetch(`${API_BASE_URL}/tweet/getTweet/${id}`)
-        const getTweetReplies = fetch(`${API_BASE_URL}/tweet/gettweetreplies/${id}`)
+        const getTweet = fetch(`${API_ENDPOINTS.TWEET.GET_TWEET_BY_ID.URL}/${id}`)
+        const getTweetReplies = fetch(`${API_ENDPOINTS.TWEET.GET_TWEET_REPLIES.URL}/${id}`)
         setLoading(true)
         Promise.all([getTweet, getTweetReplies]).then(res => {
             const res1 = res[0]
@@ -42,6 +42,11 @@ const Tweet = () => {
         }).finally(() => setLoading(false))
     }
     useEffect(() => {
+        if (!navigator.onLine) {
+            showAlert('Please check your Internet connection.')
+            navigate('/')
+            return
+        }
         getData()
 
     }, [id])
@@ -62,7 +67,7 @@ const Tweet = () => {
     const handleReply = async (replyTweet, imageUrl, user) => {
 
         try {
-            const response = await fetch(`${API_BASE_URL}/tweet/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
+            const response = await fetch(`${API_ENDPOINTS.TWEET.REPLY_TWEET.URL}/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: API_ENDPOINTS.TWEET.REPLY_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
             const newReply = await response.json()
             setReplies(prev => {
                 const newReplies = [...prev, newReply.data]
@@ -86,9 +91,9 @@ const Tweet = () => {
     }
 
     // delete reply
-    const deleteReply = (replyId) => {
+    const deleteReply = (replyToDelete) => {
 
-        fetch(`${API_BASE_URL}/tweet/delete/reply/${tweet._id}/${replyId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
+        fetch(`${API_ENDPOINTS.TWEET.DELETE_REPLY.URL}/${tweet._id}/${replyToDelete._id}`, { method: API_ENDPOINTS.TWEET.DELETE_REPLY.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` } })
             .then(res => {
                 if (res.ok) {
                     return res.json()
@@ -97,7 +102,7 @@ const Tweet = () => {
             })
             .then(() => {
                 setReplies(prev => {
-                    const newReplies = prev.filter(reply => reply._id !== replyId)
+                    const newReplies = prev.filter(reply => reply._id !== replyToDelete._id)
                     sessionStorage.setItem('replies', JSON.stringify(newReplies));
                     return newReplies
                 })
@@ -123,7 +128,7 @@ const Tweet = () => {
                     <TweetCard setReplies={setReplies} isTweetOpen={isTweetOpen} tweet={tweet} />
                     <TweetBox id={'tweet-box-reply'} buttonText={'Reply'} placeholder={'Reply your tweet '} handleImageUpload={handleImageUpload} handleSubmit={handleReply} />
                     <div className="ml-4 border-l-2 pl-4">
-                        {(replies) && replies.map(reply => <TweetCard setReplies={setReplies} deleteTweet={deleteReply} key={reply._id} tweet={reply} />)}
+                        {(replies) && replies.slice().reverse().map(reply => <TweetCard setReplies={setReplies} deleteTweet={deleteReply} key={reply._id} tweet={reply} />)}
                         {(replies && replies.length == 0) && <div>No replies</div>}
                     </div>
                 </div>

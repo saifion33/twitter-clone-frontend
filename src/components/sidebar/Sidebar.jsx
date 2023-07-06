@@ -21,7 +21,7 @@ import TweetBox from '../Tweet/TweetBox'
 import { useUploadFile } from 'react-firebase-hooks/storage'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { useTweets } from '../../Context/tweet.context'
-import { API_BASE_URL } from '../../utils/helpers'
+import { API_ENDPOINTS } from '../../utils/helpers'
 
 
 
@@ -36,6 +36,10 @@ const Sidebar = () => {
     const { pushTweet } = useTweets()
     const navigate = useNavigate()
     const handleSignOut = () => {
+        if (!navigator.onLine) {
+            showAlert('Please check your Internet connection.')
+            return
+        }
         signOut().then(() => {
             localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
             setLoggedInUser({ user: null, loading: false, error: null })
@@ -57,7 +61,7 @@ const Sidebar = () => {
     const handleTweet = async (tweet, imageUrl, user) => {
         const token = JSON.parse(localStorage.getItem('token'));
         try {
-            const response = await fetch(`${API_BASE_URL}/tweet/post`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
+            const response = await fetch(API_ENDPOINTS.TWEET.POST_TWEET.URL, { method: API_ENDPOINTS.TWEET.POST_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
             if (response.status === 401) {
                 signOut().then(() => {
                     navigate('/login')
@@ -95,7 +99,7 @@ const Sidebar = () => {
                 (user && !loading) && <div className='tweet-button-container text-center p-4'>
                     <button onClick={openTweetModal} className='bg-twitter-100 w-full py-2 px-4 rounded-full text-xl text-white font-semibold hover:bg-sky-600'>Tweet</button>
                     <Modal isOpen={isTweetModalOpen} onClose={closeTweetModal} height={'40%'} >
-                        <TweetBox buttonText={'Tweet'} placeholder={"What's happning! "} handleImageUpload={handleImageUpload} handleSubmit={handleTweet} />
+                        <TweetBox id={'sidebar-tweetbox'} buttonText={'Tweet'} placeholder={"What's happning! "} handleImageUpload={handleImageUpload} handleSubmit={handleTweet} />
                     </Modal>
                 </div>
             }
