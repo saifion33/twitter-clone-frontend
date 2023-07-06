@@ -139,7 +139,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
                         <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><BiBarChart /></div>
                         <span className='text-sm'></span>
                     </div>
-                    <div onClick={() => { copy(`http://localhost:5173/tweet/${tweet._id}`) }} className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300'>
+                    <div onClick={() => { copy(`${location.host}/tweet/${tweet._id}`) }} className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300'>
                         <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><HiArrowUpTray /></div>
                         <span className='text-sm'></span>
                     </div>
@@ -147,7 +147,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
                 <SmallModal position={'right-2'} isOpen={isOptionOpen} onClose={closeOptionModal} >
                     <div className='py-2 space-y-3 '>
                         {isAdmin && <div onClick={handleDeleteTweet} className='hover:bg-gray-200 px-2 rounded flex gap-2 items-center text-red-600'><MdDelete /> Delete Tweet</div>}
-                        <div onClick={() => copy(`http://localhost:5173/tweet/${tweet._id}`)} className='hover:bg-gray-200 px-2 rounded flex gap-2 items-center text-twitter-100'><IoIosShareAlt /> Share Tweet</div>
+                        <div onClick={() => copy(`${location.host}/tweet/${tweet._id}`)} className='hover:bg-gray-200 px-2 rounded flex gap-2 items-center text-twitter-100'><IoIosShareAlt /> Share Tweet</div>
                     </div>
                 </SmallModal>
             </div>
