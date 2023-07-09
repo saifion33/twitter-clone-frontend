@@ -71,7 +71,6 @@ const Tweet = () => {
             const newReply = await response.json()
             setReplies(prev => {
                 const newReplies = [...prev, newReply.data]
-                sessionStorage.setItem('replies', JSON.stringify(newReplies))
                 setTweet(prev => {
                     return { ...prev, replyCount: prev.replyCount + 1 }
                 })

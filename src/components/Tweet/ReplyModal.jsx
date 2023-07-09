@@ -42,7 +42,6 @@ const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
             if (tweet.replyOf && isTweetOpen == tweet._id) {
                 setReplies(prev => {
                     const newReplies = [...prev, newReply.data]
-                    sessionStorage.setItem('replies', JSON.stringify(newReplies))
                     return newReplies
                 })
             }
