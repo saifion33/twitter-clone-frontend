@@ -13,13 +13,14 @@ import { API_ENDPOINTS } from '../../utils/helpers'
 import { BiWifiOff } from 'react-icons/bi'
 
 const Home = () => {
-  const [user, loading] = useAuthState(auth)
+  const [user, userLoading] = useAuthState(auth)
   const [signOut] = useSignOut(auth)
   const [uploadImage] = useUploadFile(auth)
   const { showAlert } = useAlert()
-  const { tweets, setTweets } = useTweets()
+  const { tweets, setTweets,tweetsLoading } = useTweets()
   const navigate = useNavigate()
   const token = JSON.parse(localStorage.getItem('token'))
+
 
   // Upload image to firebase storage
   const handleImageUpload = async (image) => {
@@ -42,8 +43,8 @@ const Home = () => {
       }
       const newTweet = await response.json()
       setTweets(prev => {
-        const newTweets = [...prev.tweets, newTweet.data]
-        return { ...prev, tweets: newTweets }
+        const newTweets = [...prev, newTweet.data]
+        return newTweets
       })
     } catch (error) {
       if (error.message == '401') {
@@ -75,8 +76,8 @@ const Home = () => {
           deleteObject(ref(storage, tweet.imageUrl))
         }
         setTweets(prev => {
-          const newTweets = prev.tweets.filter(tweet => tweet._id !== tweetId)
-          return { ...prev, tweets: newTweets }
+          const newTweets = prev.filter(tweet => tweet._id !== tweetId)
+          return newTweets
         })
         showAlert('Tweet has been deleted', 'success')
       }).catch(error => {
@@ -89,20 +90,20 @@ const Home = () => {
       {
         user && <TweetBox handleImageUpload={handleImageUpload} handleSubmit={handleTweet} id={'tweet-home'} buttonText={'Tweet'} placeholder={"What's happning?!"} />
       }
-      {loading && <Loadingbar height='10' width='10' />}
+      {userLoading && <Loadingbar height='10' width='10' />}
       <div>
-        {tweets.loading && <Loadingbar />}
+        {(tweetsLoading && !tweets) && <Loadingbar />}
         {
-          (tweets.tweets && tweets.tweets.length > 0 && !tweets.loading) && tweets.tweets.slice().reverse().map((tweet) => <TweetCard deleteTweet={deleteTweet} tweet={tweet} key={tweet._id} />)
+          (tweets && tweets.length > 0 && !tweetsLoading) && tweets.toReversed().map((tweet) => <TweetCard deleteTweet={deleteTweet} tweet={tweet} key={tweet._id} />)
         }
         {
-          (tweets.tweets && tweets.tweets.length == 0) && <div className='text-4xl text-twitter-100 font-semibold text-center py-5'>No Tweets !</div>
+          (!tweets && !tweetsLoading && navigator.onLine) && <div className='text-3xl text-center'>Somthing went wrong</div>
         }
         {
-          (!tweets.tweets && !tweets.loading && navigator.onLine) && <div className='text-2xl py-10 text-slate-600 font-semibold text-center'>Something went wrong...</div>
+          (tweets && tweets.length == 0) && <div className='text-4xl text-twitter-100 font-semibold text-center py-5'>No Tweets !</div>
         }
         {
-          (!navigator.onLine && !tweets.tweets) && <div className='flex flex-col justify-center items-center py-20 text-slate-500'>
+          (!navigator.onLine && !tweets) && <div className='flex flex-col justify-center items-center py-20 text-slate-500'>
             <BiWifiOff className='text-9xl' />
             <p className='text-2xl font-semibold'>Check your Internet</p>
           </div>
