@@ -9,7 +9,7 @@ const TweetContext = ({ children }) => {
     // fetch tweets from server
     const getTweets=()=>{
         setTweetsLoading(true)
-        fetch(API_ENDPOINTS.TWEET.GET_ALL_TWEETS.URL)
+        fetch(API_ENDPOINTS.TWEET.GET_ALL_TWEETS.URL,{headers:{'Content-Type': 'application/json','Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)}`}})
         .then((res)=>{
           if (res.ok) {
             return res.json()
