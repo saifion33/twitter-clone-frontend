@@ -9,7 +9,7 @@ import ProfileEditor from '../ProfileEditor'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../Context/auth.context'
 import { useAlert } from '../../Context/alert.context'
-import { API_ENDPOINTS } from '../../utils/helpers'
+import {  GET_USER_BY_ID } from '../../utils/helpers'
 import Loadingbar from '../Loadingbar'
 
 const Profile = () => {
@@ -21,19 +21,16 @@ const Profile = () => {
   const { showAlert } = useAlert()
   const getUser = (userId) => {
     setLoading(true)
-    const token = JSON.parse(localStorage.getItem('token'))
-    fetch(`${API_ENDPOINTS.USER.GET_USER_BY_ID.URL}/${userId}`, { headers: { 'content-type': 'application/json', 'Accept': '*/*', 'Origin': 'http://localhost:5173/', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` } })
-      .then(res => {
-        if (res.ok) {
-          return res.json()
-        }
-        throw new Error(res.status)
-      })
-      .then((data) => {
-        setUser(data.data)
-      })
-      .catch((err) => { showAlert('Somthing went wrong', 'danger'); console.log(err.message) })
-      .finally(() => setLoading(false))
+    GET_USER_BY_ID(userId)
+    .then(res=>{
+      const user=res.data.data
+      setUser(user)
+    })
+    .catch(err=>{
+      console.log(err.message)
+    })
+    .finally(()=>setLoading(false))
+    
   }
   useEffect(() => {
     if (!navigator.onLine) {
@@ -103,6 +100,9 @@ const Profile = () => {
         loading && <div className='w-full h-full flex justify-center items-center'>
           <Loadingbar />
         </div>
+      }
+      {
+        (!loading && !user) && <div className='text-2xl text-center text-slate-600 font-semibold py-5 '>Something went wrong</div>
       }
     </div>
 

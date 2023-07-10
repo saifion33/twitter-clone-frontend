@@ -9,7 +9,7 @@ import { useUploadFile } from 'react-firebase-hooks/storage'
 import { getDownloadURL, ref, deleteObject } from 'firebase/storage'
 import { useAlert } from '../../Context/alert.context'
 import { useNavigate } from 'react-router-dom'
-import { API_ENDPOINTS } from '../../utils/helpers'
+import { DELETE_TWEET, POST_TWEET } from '../../utils/helpers'
 import { BiWifiOff } from 'react-icons/bi'
 
 const Home = () => {
@@ -19,7 +19,6 @@ const Home = () => {
   const { showAlert } = useAlert()
   const { tweets, setTweets,tweetsLoading } = useTweets()
   const navigate = useNavigate()
-  const token = JSON.parse(localStorage.getItem('token'))
 
 
   // Upload image to firebase storage
@@ -36,25 +35,22 @@ const Home = () => {
 
   // TWEET
   const handleTweet = async (tweet, imageUrl, user) => {
-    try {
-      const response = await fetch(API_ENDPOINTS.TWEET.POST_TWEET.URL, { method: API_ENDPOINTS.TWEET.POST_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
-      if (!response.ok) {
-        throw new Error(response.status)
-      }
-      const newTweet = await response.json()
+    POST_TWEET({tweet,imageUrl,user})
+    .then(response=>{
+      const newTweet=response.data.data
       setTweets(prev => {
-        const newTweets = [...prev, newTweet.data]
+        const newTweets = [...prev, newTweet]
         return newTweets
       })
-    } catch (error) {
-      if (error.message == '401') {
-        signOut().then(() => {
-          navigate('/login')
-        })
+    })
+    .catch(err => {
+      console.log(err.message)
+      if (err.response.status==401) {
+        signOut()
+        navigate('/login')
       }
-      console.log(error)
-    }
-
+    })
+    
   }
 
   // handle Delete tweet
@@ -64,26 +60,26 @@ const Home = () => {
       return
     }
     const tweetId = tweet._id
-    fetch(`${API_ENDPOINTS.TWEET.DELETE_TWEET.URL}/${tweetId}`, { method: API_ENDPOINTS.TWEET.DELETE_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` } })
-      .then((res) => {
-        if (res.ok) {
-          return res.json()
-        }
-        throw new Error(res.status)
+    DELETE_TWEET(tweetId)
+    .then(()=>{
+      if (tweet.imageUrl) {
+        deleteObject(ref(storage, tweet.imageUrl))
+      }
+      setTweets(prev => {
+        const newTweets = prev.filter(tweet => tweet._id !== tweetId)
+        return newTweets
       })
-      .then(() => {
-        if (tweet.imageUrl) {
-          deleteObject(ref(storage, tweet.imageUrl))
-        }
-        setTweets(prev => {
-          const newTweets = prev.filter(tweet => tweet._id !== tweetId)
-          return newTweets
-        })
-        showAlert('Tweet has been deleted', 'success')
-      }).catch(error => {
-        console.log(error)
-        showAlert('There was an error', 'danger')
-      })
+      showAlert('Tweet has been deleted', 'success')
+    })
+    .catch(err=>{
+      console.log(err)
+      showAlert('There was an error', 'danger')
+      if(err.response.status==401){
+        signOut()
+        navigate('/login')
+      }
+    })
+    
   }
   return (
     <div>

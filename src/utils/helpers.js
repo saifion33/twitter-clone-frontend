@@ -1,37 +1,55 @@
-export const API_BASE_URL = 'https://twitter-clone.cyclic.app'
-export const API_ENDPOINTS = {
-    AUTH: {
-        SIGNUP: { URL: `${API_BASE_URL}/auth/signup`, METHOD: 'POST' },
-        LOGIN: { URL: `${API_BASE_URL}/auth/login`, METHOD: 'GET' }, //  API_BASE_URL/auth/login/:email/:id
-        IS_USER_EXIST: { URL: `${API_BASE_URL}/auth/isUserExist` }, // API_BASE_URL/auth/isUserExist/:email
-    },
-    TWEET: {
-        // 1. GET ALL TWEETS
-        GET_ALL_TWEETS: { URL: `${API_BASE_URL}/tweet/alltweets`, METHOD: 'GET' },
+import axios from 'axios'
+const API_BASE_URL = 'https://twitter-clone.cyclic.app'
 
-        // 2. POST TWEET
-        POST_TWEET: { URL: `${API_BASE_URL}/tweet/post`, METHOD: 'POST' },
-
-        // 3. REPLY TO TWEET
-        REPLY_TWEET: { URL: `${API_BASE_URL}/tweet/reply`, METHOD: 'PATCH' }, // API_BASE_URL/tweet/reply/:tweetId
-
-        // 4. LIKE TWEET
-        LIKE_TWEET: { URL: `${API_BASE_URL}/tweet/like`, METHOD: 'PATCH' }, // API_BASE_URL/tweet/like/:tweetId
-
-        // 5. GET TWEET REPLIES
-        GET_TWEET_REPLIES: { URL: `${API_BASE_URL}/tweet/gettweetreplies`, METHOD: 'GET' }, // API_BASE_URL/tweet/gettweetreplies/:tweetId
-
-        // 6. DELETE TWEET
-        DELETE_TWEET: { URL: `${API_BASE_URL}/tweet/delete`, METHOD: 'DELETE' }, // API_BASE_URL/tweet/delete/:tweetId
-
-        // 7. DELETE REPLY
-        DELETE_REPLY: { URL: `${API_BASE_URL}/tweet/delete/reply`, METHOD: 'DELETE' }, // API_BASE_URL/tweet/delete/reply/:tweetId/:replyId
-
-        // 8. GET TWEET BY ID
-        GET_TWEET_BY_ID: { URL: `${API_BASE_URL}/tweet/getTweet`, METHOD: 'GET' }, // API_BASE_URL/tweet/like/:tweetId
-    },
-    USER: {
-        GET_USER_BY_ID: { URL: `${API_BASE_URL}/user/userById`, METHOD: 'GET' },// API_BASE_URL/user/:userId
-        UPDATE_USER: { URL: `${API_BASE_URL}/user/updateuser`, METHOD: 'PATCH' },// API_BASE_URL/user/updateuser/:email
+const token=JSON.parse(localStorage.getItem('token'))
+const api=axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization':`Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}`
     }
-}
+})
+
+// ************************************************ AUTH FUNCTIONS ************************************************
+// SIGNUP FUNCTION
+export const SIGN_UP=data=>api.post('/auth/signup',{data})
+
+// LOGIN FUNCTION
+export const LOGIN=(email,id)=>api.get(`/auth/login/${email}/${id}`)
+
+// IS USER EXIST FUNCTION
+export const IS_USER_EXIST=(email)=>api.get(`/auth/isUserExist/${email}`)
+
+// ************************************************** TWEETS FUNCTIONS ************************************************
+
+// GET ALL TWEETS FUNCTION
+export const GET_ALL_TWEETS=()=>api.get('/tweet/alltweets')
+
+// POST TWEET FUNCTION
+export const POST_TWEET=data=>api.post('/tweet/post',data)
+
+// REPLY TO TWEET FUNCTION
+export const REPLY_TWEET=(reply,tweet)=>api.patch(`/tweet/reply/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`,reply)
+
+// LIKE TWEET FUNCTION
+export const LIKE_TWEET=(tweet)=>api.patch(`/tweet/like/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`)
+
+// GET TWEET REPLIES FUNCTION
+export const GET_TWEET_REPLIES=(tweetId)=>api.get(`/tweet/gettweetreplies/${tweetId}`)
+
+// DELETE TWEET FUNCTION
+export const DELETE_TWEET=(tweetId)=>api.delete(`/tweet/delete/${tweetId}`)
+
+// DELETE REPLY FUNCTION
+export const DELETE_REPLY=(tweetId,replyId)=>api.delete(`/tweet/delete/reply/${tweetId}/${replyId}`)
+
+// GET TWEET BY ID FUNCTION
+export const GET_TWEET_BY_ID=(tweetId)=>api.get(`/tweet/getTweet/${tweetId}`)
+
+// ************************************************* USER FUNCTIONS *********************************************************************
+
+// GET USER BY ID FUNCTION
+export const GET_USER_BY_ID=userId=>api.get(`/user/userByID/${userId}`)
+
+// UPDATE USER FUNCTION
+export const UPDATE_USER=(email,updates)=>api.patch(`/user/updateuser/${email}`,{updates})

@@ -4,50 +4,49 @@ import { useCreateUserWithEmailAndPassword, useSignInWithEmailAndPassword, useSi
 import { auth } from '../firebase/firebase'
 import { useAlert } from './alert.context'
 import { useNavigate } from 'react-router-dom'
-import { API_ENDPOINTS } from '../utils/helpers'
+import { IS_USER_EXIST, LOGIN, SIGN_UP } from '../utils/helpers'
 
 const authContext = createContext(null)
 
 const AuthContext = ({ children }) => {
     const [loggedInUser, setLoggedInUser] = useState(localStorage.getItem('loggedInUser') ? JSON.parse(localStorage.getItem('loggedInUser')) : { user: null, loading: false, error: null })
-    const [signInGoogle] = useSignInWithGoogle(auth)
     const [CreateAccount] = useCreateUserWithEmailAndPassword(auth)
     const [signInWithEmail] = useSignInWithEmailAndPassword(auth);
+    const [signInGoogle] = useSignInWithGoogle(auth)
     const { showAlert } = useAlert()
     const navigate = useNavigate()
+
+
     const signUp = async (googleResponse) => {
-        const body = JSON.stringify({
+        const data= JSON.stringify({
             id: googleResponse.user.uid,
-            name: googleResponse._tokenResponse.displayName,
-            email: googleResponse._tokenResponse.email,
-            userName: googleResponse._tokenResponse.email.split('@')[0],
-            avatarUrl: googleResponse._tokenResponse.photoUrl
+            name: googleResponse.user.displayName,
+            email: googleResponse.user.email,
+            userName: googleResponse.user.email.split('@')[0],
+            avatarUrl: googleResponse.user.photoUrl
         })
-        const method = API_ENDPOINTS.AUTH.SIGNUP.METHOD
-        const headers = { 'Content-Type': 'application/json', 'Authorization':`Basic ${btoa(import.meta.env.VITE_API_SECRET)}`}
-        // ** REGISTER NEW USER IN DATABASE
-        fetch(API_ENDPOINTS.AUTH.SIGNUP.URL, { method, headers, body })
-            .then(response => response.json())
-            .then(response => {
-                console.log(response)
-                localStorage.setItem('token', JSON.stringify(response.data.token))
-                setLoggedInUser(prev => {
-                    const newState = { ...prev, user: response.data.user, loading: false }
-                    localStorage.setItem('loggedInUser', JSON.stringify(newState))
-                    return newState
-                });
-                navigate('/')
-                showAlert('Signup successfully .', 'success')
-            })
-            .catch(err => {
-                console.log(err);
-                setLoggedInUser(prev => {
-                    const newState = { ...prev, error: err }
-                    localStorage.setItem('loggedInUser', JSON.stringify(newState))
-                    return newState
-                });
-                showAlert(`Signup Failed ${err.message}`, 'danger')
-            })
+        // CALL SIGNUP API
+        SIGN_UP(data)
+        .then(response=>{
+            const {token,user}=response.data
+            localStorage.setItem('token', JSON.stringify(token))
+                    setLoggedInUser(prev => {
+                        const newState = { ...prev, user, loading: false }
+                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                        return newState
+                    });
+                    navigate('/')
+                    showAlert('Signup successfully .', 'success')
+        })
+        .catch(err => {
+                    console.log(err);
+                    setLoggedInUser(prev => {
+                        const newState = { ...prev, error: err.message }
+                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                        return newState
+                    });
+                    showAlert(`Signup Failed ${err.message}`, 'danger')
+                })
     }
 
     // ** SIGN UP WITH GOOGLE
@@ -60,14 +59,13 @@ const AuthContext = ({ children }) => {
             })
             .catch(err => {
                 console.log(err);
-                showAlert('Signup Failed. ' + err.message, 'danger')
             })
 
     }
     const login = async (email, id) => {
         try {
-            const response = await fetch(`${API_ENDPOINTS.AUTH.LOGIN.URL}/${email}/${id}`,{headers:{'content-type': 'application/json','Authorization': `${btoa(import.meta.env.VITE_API_SECRET)}`}})
-            const data = await response.json();
+            const response=await LOGIN(email,id)
+            const {data}=response.data;
             return { data, status: response.status }
         } catch (error) {
             console.log(error)
@@ -80,8 +78,8 @@ const AuthContext = ({ children }) => {
         setLoggedInUser({ ...loggedInUser, loading: true })
         signInGoogle()
             .then(async (googleResponse) => {
-                const isUserExist = await fetch(`${API_ENDPOINTS.AUTH.IS_USER_EXIST.URL}/${googleResponse.user.email}`,{headers:{'content-type': 'application/json','Authorization':`${btoa(import.meta.env.VITE_API_SECRET)}`}})
-                if (isUserExist.ok) {
+                const isUserExist = await IS_USER_EXIST(googleResponse.user.email)
+                if (isUserExist.data) {
                     login(googleResponse.user.email, googleResponse.user.uid)
                         .then(response => {
                             if (response.status === 404) {
@@ -111,51 +109,23 @@ const AuthContext = ({ children }) => {
                     return
                 }
                 signUp(googleResponse)
-
             })
             .catch((err) => {
                 console.log(err); showAlert('SignIn failed  .', 'danger')
             })
     }
+
+    // ********************************** SIGN UP WITH EMAIL AND PASSWORD *************************************************************
     const SignUpWithEmailAndPassword = async (name, email, password) => {
         CreateAccount(email, password).then((googleResponse) => {
-            console.log(googleResponse)
-            const body = JSON.stringify({
-                name,
-                id: googleResponse.user.uid,
-                email: googleResponse.user.email,
-                userName: googleResponse.user.email.split('@')[0],
-                avatarUrl: googleResponse.user.photoURL
-            })
-            const method = API_ENDPOINTS.AUTH.SIGNUP.METHOD
-            const headers = { 'Content-Type': 'application/json','Authorization':`Basic ${btoa(import.meta.env.VITE_API_SECRET)}` }
-            fetch(API_ENDPOINTS.AUTH.SIGNUP.URL, { method, headers, body })
-                .then(response => response.json())
-                .then(response => {
-
-                    setLoggedInUser(prev => {
-                        localStorage.setItem('token', JSON.stringify(response.data.token));
-                        const newState = { ...prev, user: response.data.user, loading: false }
-                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
-                        return newState
-                    });
-                    navigate('/')
-                    showAlert('Signup successfully .', 'success')
-                })
-                .catch(err => {
-                    console.log(err);
-                    setLoggedInUser(prev => {
-                        const newState = { ...prev, error: err }
-                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
-                        return newState
-                    });
-                    showAlert(`Signup Failed ${err.message}`, 'danger')
-                })
+            googleResponse.user.displayName=name;
+            signUp(googleResponse)
         }).catch(err => {
             console.log(err);
             showAlert('Signup Failed. ' + err.message, 'danger')
         })
     }
+
     const signInWithEmailAndPassword = async (email, password) => {
         const googleResponse = await signInWithEmail(email, password)
         if (!googleResponse) {

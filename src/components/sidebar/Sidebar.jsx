@@ -21,7 +21,7 @@ import TweetBox from '../Tweet/TweetBox'
 import { useUploadFile } from 'react-firebase-hooks/storage'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { useTweets } from '../../Context/tweet.context'
-import { API_ENDPOINTS } from '../../utils/helpers'
+import {POST_TWEET } from '../../utils/helpers'
 
 
 
@@ -35,6 +35,7 @@ const Sidebar = () => {
     const { showAlert } = useAlert()
     const { pushTweet } = useTweets()
     const navigate = useNavigate()
+
     const handleSignOut = () => {
         if (!navigator.onLine) {
             showAlert('Please check your Internet connection.')
@@ -59,23 +60,21 @@ const Sidebar = () => {
         }
     }
     const handleTweet = async (tweet, imageUrl, user) => {
-        const token = JSON.parse(localStorage.getItem('token'));
-        try {
-            const response = await fetch(API_ENDPOINTS.TWEET.POST_TWEET.URL, { method: API_ENDPOINTS.TWEET.POST_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ tweet, imageUrl, user }) })
-            if (response.status === 401) {
+        POST_TWEET({tweet,imageUrl,user})
+        .then(res=>{
+            const newTweet=res.data.data;
+            pushTweet(newTweet)
+            closeTweetModal()
+        })
+        .catch(err=>{
+            if (err.response.status == 401) {
                 signOut().then(() => {
                     navigate('/login')
                 })
-                return
             }
-            const newTweet = await response.json()
-            pushTweet(newTweet.data)
-            closeTweetModal()
-        } catch (error) {
-            console.log(error)
-            closeTweetModal()
-        }
-
+            console.log(err)
+        })
+       
     }
     return (
 

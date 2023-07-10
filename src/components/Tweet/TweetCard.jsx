@@ -17,7 +17,7 @@ import SmallModal from '../Modal/SmallModal'
 import { MdDelete } from 'react-icons/md'
 import { useAuth } from '../../Context/auth.context'
 import { useAlert } from '../../Context/alert.context'
-import { API_ENDPOINTS } from '../../utils/helpers'
+import { LIKE_TWEET } from '../../utils/helpers'
 
 const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
@@ -54,7 +54,6 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         setTimeout(() => {
             setAnimateClass('')
         }, 1000);
-        const token = JSON.parse(localStorage.getItem('token'))
         if (!loggedInUser.user) {
             navigate('/login')
             return
@@ -67,14 +66,8 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         else {
             tweet.likes.push(userId)
         }
-        const url = `${API_ENDPOINTS.TWEET.LIKE_TWEET.URL}/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`
-
-        fetch(url, { method: API_ENDPOINTS.TWEET.LIKE_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Accept': '*/*', 'Origin': 'http://localhost:5173/', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ userId }) }).then((res) => {
-            if (!res.ok) {
-                throw new Error(res.status)
-            }
-        }).catch(err => {
-            console.log(err)
+        LIKE_TWEET(tweet).catch(err => {
+            console.log(err.message)
             if (!isLiked) {
                 const newLikes = tweet.likes.filter(id => id != userId)
                 tweet.likes = newLikes
@@ -87,7 +80,6 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     }
     const openProfile = (e) => {
         e.stopPropagation();
-        sessionStorage.setItem('user', JSON.stringify({ loading: false, user: tweet.user, error: null }))
         navigate(`/profile/${tweet.user.id}`)
     }
 

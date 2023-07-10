@@ -9,7 +9,7 @@ import { auth, storage } from '../../firebase/firebase'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { useAuth } from '../../Context/auth.context'
 import { useNavigate } from 'react-router-dom'
-import { API_ENDPOINTS } from '../../utils/helpers'
+import { REPLY_TWEET } from '../../utils/helpers'
 
 const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
     const { loggedInUser } = useAuth()
@@ -31,27 +31,25 @@ const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
             return null
         }
     }
-    const handleReply = async (replyTweet, imageUrl, user) => {
-        const token = JSON.parse(localStorage.getItem('token'));
-        try {
-            const response = await fetch(`${API_ENDPOINTS.TWEET.REPLY_TWEET.URL}/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: API_ENDPOINTS.TWEET.REPLY_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
-            if (!response.ok) {
-                throw new Error('There was an error')
-            }
-            const newReply = await response.json()
-            if (tweet.replyOf && isTweetOpen == tweet._id) {
-                setReplies(prev => {
-                    const newReplies = [...prev, newReply.data]
-                    return newReplies
-                })
-            }
-            tweet.replyCount += 1
-            closeModal()
-        } catch (error) {
-            console.log(error)
-            closeModal()
-        }
 
+
+    const handleReply = async (replyTweet, imageUrl, user) => {
+            REPLY_TWEET({replyTweet,imageUrl,user},tweet)
+            .then((response)=>{
+                const newReply=response.data.data
+                if (tweet.replyOf && isTweetOpen == tweet._id) {
+                    setReplies(prev => {
+                        const newReplies = [...prev, newReply]
+                        return newReplies
+                    })
+                }
+                tweet.replyCount += 1
+                closeModal()
+            })
+            .catch(err=>{
+                console.log(err.message)
+                closeModal()
+            })
     }
 
     return (

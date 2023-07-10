@@ -7,7 +7,7 @@ import { getDownloadURL, ref } from "firebase/storage"
 import { useAlert } from "../../Context/alert.context"
 import { useAuth } from "../../Context/auth.context"
 import { MdOutlineArrowBack } from "react-icons/md"
-import { API_ENDPOINTS } from "../../utils/helpers"
+import { DELETE_REPLY, GET_TWEET_BY_ID, GET_TWEET_REPLIES, REPLY_TWEET } from "../../utils/helpers"
 import Loadingbar from "../Loadingbar"
 import TweetCard from "./TweetCard"
 import TweetBox from "./TweetBox"
@@ -15,8 +15,6 @@ import TweetBox from "./TweetBox"
 
 
 const Tweet = () => {
-
-    const token = JSON.parse(localStorage.getItem('token'))
     const [isTweetOpen, setIsTweetOpen] = useState(false)
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
@@ -28,18 +26,20 @@ const Tweet = () => {
     const { id } = useParams()
 
     const getData = () => {
-        const getTweet = fetch(`${API_ENDPOINTS.TWEET.GET_TWEET_BY_ID.URL}/${id}`, { headers: { 'content-type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)}` } })
-        const getTweetReplies = fetch(`${API_ENDPOINTS.TWEET.GET_TWEET_REPLIES.URL}/${id}`, { headers: { 'content-type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)}` } })
+        const getTweet = GET_TWEET_BY_ID(id)
+        const getTweetReplies = GET_TWEET_REPLIES(id)
         setLoading(true)
         Promise.all([getTweet, getTweetReplies]).then(res => {
-            const res1 = res[0]
-            const res2 = res[1]
-            return Promise.all([res1.json(), res2.json()])
-        }).then((res) => {
-            setTweet(res[0].data)
-            setIsTweetOpen(res[0].data._id)
-            setReplies(res[1].data)
-        }).finally(() => setLoading(false))
+            const tweet = res[0].data.data
+            const replies = res[1].data.data
+            setTweet(tweet)
+            setIsTweetOpen(tweet._id)
+            setReplies(replies)
+        })
+        .catch((err)=>{
+            console.log(err.message)
+        })
+        .finally(() => setLoading(false))
     }
     useEffect(() => {
         if (!navigator.onLine) {
@@ -65,22 +65,20 @@ const Tweet = () => {
 
     // handle reply
     const handleReply = async (replyTweet, imageUrl, user) => {
-
-        try {
-            const response = await fetch(`${API_ENDPOINTS.TWEET.REPLY_TWEET.URL}/${tweet._id}${tweet.replyOf ? `?replyOf=${tweet.replyOf}` : ''}`, { method: API_ENDPOINTS.TWEET.REPLY_TWEET.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` }, body: JSON.stringify({ replyTweet, imageUrl, user }) })
-            const newReply = await response.json()
+        REPLY_TWEET({replyTweet,imageUrl,user},tweet)
+        .then(response=>{
+            const newReply=response.data.data
             setReplies(prev => {
-                const newReplies = [...prev, newReply.data]
-                setTweet(prev => {
-                    return { ...prev, replyCount: prev.replyCount + 1 }
-                })
-
+                const newReplies = [...prev, newReply]
                 return newReplies
             })
-        } catch (error) {
-            console.log(error)
-        }
-
+            setTweet(prev => {
+                return { ...prev, replyCount: prev.replyCount + 1 }
+            })
+        })
+        .catch(err=>{
+            console.log(err.message)
+        })
 
     }
 
@@ -92,13 +90,7 @@ const Tweet = () => {
     // delete reply
     const deleteReply = (replyToDelete) => {
 
-        fetch(`${API_ENDPOINTS.TWEET.DELETE_REPLY.URL}/${tweet._id}/${replyToDelete._id}`, { method: API_ENDPOINTS.TWEET.DELETE_REPLY.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}` } })
-            .then(res => {
-                if (res.ok) {
-                    return res.json()
-                }
-                throw new Error(res.status)
-            })
+        DELETE_REPLY(tweet._id,replyToDelete._id)
             .then(() => {
                 setReplies(prev => {
                     const newReplies = prev.filter(reply => reply._id !== replyToDelete._id)
@@ -129,6 +121,7 @@ const Tweet = () => {
                     <div className="ml-4 border-l-2 pl-4">
                         {(replies) && replies.slice().reverse().map(reply => <TweetCard setReplies={setReplies} deleteTweet={deleteReply} key={reply._id} tweet={reply} />)}
                         {(replies && replies.length == 0) && <div>No replies</div>}
+                       
                     </div>
                 </div>
             }
@@ -136,6 +129,9 @@ const Tweet = () => {
                 loading && <div className="w-full h-full flex justify-center items-center">
                     <Loadingbar />
                 </div>
+            }
+            {
+                 (!(tweet || replies) && !loading)&& <div className="text-2xl text-slate-600 text-center font-semibold ">Something went wrong</div>
             }
         </div>
     )

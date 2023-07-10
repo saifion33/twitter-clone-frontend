@@ -9,7 +9,7 @@ import { AiFillCloseCircle } from 'react-icons/ai'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { storage } from '../firebase/firebase'
 import Loadingbar from './Loadingbar'
-import { API_ENDPOINTS } from '../utils/helpers'
+import { UPDATE_USER } from '../utils/helpers'
 import { useAlert } from '../Context/alert.context'
 
 const ProfileEditor = () => {
@@ -71,34 +71,25 @@ const ProfileEditor = () => {
       if (values.location !== formik.initialValues.location) {
         update.location = values.location
       }
-      const token = JSON.parse(localStorage.getItem('token'))
-      fetch(`${API_ENDPOINTS.USER.UPDATE_USER.URL}/${loggedInUser.user.email}`, { method: API_ENDPOINTS.USER.UPDATE_USER.METHOD, headers: { 'Content-Type': 'application/json', 'Authorization': `hack no-way ${token}` }, body: JSON.stringify({ update }) })
-        .then(res => {
-          let message;
-          if (res.ok) {
-            return res.json()
-          }
-          if (res.status == 409) {
-            message = 'userName is Already exist'
-          }
-          throw new Error(message)
+      
+      UPDATE_USER(loggedInUser.user.email)
+      .then(res=>{
+        const user=res.data.data
+        setLoggedInUser(prev => {
+          const updatedUser = { ...prev, user}
+          localStorage.setItem('loggedInUser', JSON.stringify(updatedUser))
+          return updatedUser
         })
-        .then(res => {
-
-          setLoggedInUser(prev => {
-            const updatedUser = { ...prev, user: res.data }
-            localStorage.setItem('loggedInUser', JSON.stringify(updatedUser))
-            return updatedUser
-          })
-          showAlert('Updated Successfully. 😊', 'success')
+        showAlert('Updated Successfully. 😊', 'success')
+      })
+      .catch(err=>{
+        if (err.response.status==409) {
+          showAlert('UserName Already Exists.','danger')
         }
-        )
-        .catch(err => {
-          showAlert(err.message, 'danger')
-          console.log(err)
-        })
-        .finally(() => setIsUpdating(false))
+      })
+      .finally(()=>setIsUpdating(false))
     } catch (error) {
+      showAlert(`Error: ${error.message}`,'danger')
       console.log(error)
     }
 

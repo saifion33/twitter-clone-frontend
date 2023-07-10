@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { API_ENDPOINTS } from '../utils/helpers'
+import { GET_ALL_TWEETS } from '../utils/helpers'
 const tweetContext = createContext(null)
 const TweetContext = ({ children }) => {
     const [tweetsLoading,setTweetsLoading]=useState(false)
@@ -9,15 +9,13 @@ const TweetContext = ({ children }) => {
     // fetch tweets from server
     const getTweets=()=>{
         setTweetsLoading(true)
-        fetch(API_ENDPOINTS.TWEET.GET_ALL_TWEETS.URL,{headers:{'Content-Type': 'application/json','Authorization': `Basic ${btoa(import.meta.env.VITE_API_SECRET)}`}})
-        .then((res)=>{
-          if (res.ok) {
-            return res.json()
-          }
-          throw new Error(res.statusText)
+        GET_ALL_TWEETS()
+        .then(res=>{
+            setTweets(res.data.data)
         })
-        .then((response)=>setTweets(response.data))
-        .catch((error)=>console.log(error.message))
+        .catch(err=>{
+            console.log(err.message)
+        })
         .finally(()=>setTweetsLoading(false))
       }
 // run get tweets function when component is mounted
