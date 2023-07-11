@@ -133,9 +133,9 @@ const AuthContext = ({ children }) => {
         }
         login(googleResponse.user.email, googleResponse.user.uid)
             .then(response => {
-                localStorage.setItem('token', JSON.stringify(response.data.data.token))
+                localStorage.setItem('token', JSON.stringify(response.data.token))
                 setLoggedInUser(prev => {
-                    const newState = { ...prev, user: response.data.data.user, loading: false }
+                    const newState = { ...prev, user: response.data.user, loading: false }
                     localStorage.setItem('loggedInUser', JSON.stringify(newState))
                     return newState
                 })

@@ -1,7 +1,7 @@
 import axios from 'axios'
 const API_BASE_URL = 'https://twitter-clone.cyclic.app'
 
-const token=localStorage.getItem('token') && JSON.parse(localStorage.getItem('token'))
+const token=localStorage.getItem('token')?JSON.parse(localStorage.getItem('token')):'faketoken'
 const api=axios.create({
     baseURL: API_BASE_URL,
     headers: {
