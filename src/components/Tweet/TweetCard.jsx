@@ -40,6 +40,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
             showAlert('Please check your Internet connection.')
             return
         }
+        
         deleteTweet(tweet)
     }
     const userId = loggedInUser.user && loggedInUser.user.id
@@ -66,7 +67,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         else {
             tweet.likes.push(userId)
         }
-        LIKE_TWEET(tweet).catch(err => {
+        LIKE_TWEET(tweet).catch(err => {            
             console.log(err.message)
             if (!isLiked) {
                 const newLikes = tweet.likes.filter(id => id != userId)
