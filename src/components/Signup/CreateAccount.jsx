@@ -1,17 +1,14 @@
 /* eslint-disable react/prop-types */
 import React, { useRef, useState } from 'react'
 import { useFormik } from 'formik'
-import { auth } from '../../firebase/firebase'
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth'
 import Loadingbar from '../Loadingbar'
 import { useAuth } from '../../Context/auth.context'
 const CreateAccount = ({ setIsCreateAccount }) => {
 
-    // eslint-disable-next-line no-unused-vars
-    const [CreateAccount, user, loading, error] = useCreateUserWithEmailAndPassword(auth)
     const nameRef = useRef(null)
     const emailRef = useRef(null)
     const passwordRef = useRef(null)
+    const [loading, setLoading] = useState(false)
     const [nameActive, setNameActive] = useState(false)
     const [emailActive, setEmailActive] = useState(false)
     const [passwordActive, setPasswordActive] = useState(false)
@@ -46,7 +43,13 @@ const CreateAccount = ({ setIsCreateAccount }) => {
             password: '',
         }, validate,
         onSubmit: async (values) => {
-            SignUpWithEmailAndPassword(values.name, values.email, values.password)
+           try {
+            setLoading(true)
+            SignUpWithEmailAndPassword(values.name, values.email, values.password).finally(()=>setLoading(false))
+           } catch (error) {
+            console.log(error.message)
+            setLoading(false)
+           }
         }
     })
 

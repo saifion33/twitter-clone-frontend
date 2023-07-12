@@ -12,7 +12,7 @@ const api=axios.create({
 
 // ************************************************ AUTH FUNCTIONS ************************************************
 // SIGNUP FUNCTION
-export const SIGN_UP=data=>api.post('/auth/signup',{data})
+export const SIGN_UP=data=>api.post('/auth/signup',data)
 
 // LOGIN FUNCTION
 export const LOGIN=(email,id)=>api.get(`/auth/login/${email}/${id}`)
@@ -53,3 +53,19 @@ export const GET_USER_BY_ID=userId=>api.get(`/user/userByID/${userId}`)
 
 // UPDATE USER FUNCTION
 export const UPDATE_USER=(email,updates)=>api.patch(`/user/updateuser/${email}`,{updates})
+
+// CONVERT IMAGE TO BLOB
+export const getImageBlob = async (editorRef) => {
+    return new Promise((resolve, reject) => {
+      const canvas = editorRef.current.getImageScaledToCanvas()
+      canvas.toBlob(blob => {
+        if (blob) {
+          resolve(blob)
+        }
+        else {
+          reject(new Error('cant process file'));
+        }
+      })
+    })
+
+  }
