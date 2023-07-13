@@ -11,6 +11,7 @@ import { useAlert } from '../../Context/alert.context'
 import { useNavigate } from 'react-router-dom'
 import { DELETE_TWEET, POST_TWEET } from '../../utils/helpers'
 import { BiWifiOff } from 'react-icons/bi'
+import { useAuth } from '../../Context/auth.context'
 
 const Home = () => {
   const [user, userLoading] = useAuthState(auth)
@@ -18,6 +19,7 @@ const Home = () => {
   const [uploadImage] = useUploadFile(auth)
   const { showAlert } = useAlert()
   const { tweets, setTweets,tweetsLoading } = useTweets()
+  const {setLoggedInUser}=useAuth()
   const navigate = useNavigate()
 
 
@@ -44,11 +46,16 @@ const Home = () => {
       })
     })
     .catch(err => {
-      console.log(err.message)
-      if (err.response.status==401) {
-        signOut()
-        navigate('/login')
+      if (err.response.status===401) {
+        signOut().then(()=>{
+          navigate('/login')
+          setLoggedInUser({user:null,loading:false,error:null})
+        
+        })
+        return
       }
+      console.log(err)
+      showAlert('There was an error','danger')
     })
     
   }
@@ -72,12 +79,16 @@ const Home = () => {
       showAlert('Tweet has been deleted', 'success')
     })
     .catch(err=>{
+      if (err.response.status===401) {
+        signOut().then(()=>{
+          navigate('/login')
+          setLoggedInUser({ user: null, loading: false, error: null })
+          localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+        })
+        return
+      }
       console.log(err)
       showAlert('There was an error', 'danger')
-      if(err.response.status==401){
-        signOut()
-        navigate('/login')
-      }
     })
     
   }
