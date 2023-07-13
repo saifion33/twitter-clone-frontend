@@ -1,12 +1,12 @@
 import axios from 'axios'
-const API_BASE_URL = import.meta.env.VITE_HOST || 'http://localhost:5000'
+const API_BASE_URL = import.meta.env.HOST || 'http://localhost:5000'
 
 const token=localStorage.getItem('token')?JSON.parse(localStorage.getItem('token')):'faketoken'
 const api=axios.create({
     baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
-        'Authorization':`Basic ${btoa(import.meta.env.VITE_API_SECRET)} ${token}`
+        'Authorization':`Basic ${btoa(import.meta.env.API_SECRET)} ${token}`
     }
 })
 
