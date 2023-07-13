@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
 
-    const { SignInWithGoogle, signInWithEmailAndPassword,emailSignInError } = useAuth()
+    const { SignInWithGoogle, signInWithEmailAndPassword } = useAuth()
     const { showAlert } = useAlert()
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
@@ -83,9 +83,6 @@ const Login = () => {
                             <p className='text-sm text-gray-700'>Don&apos;t have an account? <span className='text-twitter-100 cursor-pointer'>Sign up</span></p>
                         </div>
                     </div>
-                    {
-                        emailSignInError && <div>{emailSignInError.message}</div>
-                    }
                 </div>
             }
             {

@@ -1,13 +1,12 @@
 /* eslint-disable react/prop-types */
-import React, { Suspense,lazy, useState } from 'react'
+import React, { useState } from 'react'
 
 import { useAuth } from '../../Context/auth.context'
 import { AiFillApple } from 'react-icons/ai'
 import { FcGoogle } from 'react-icons/fc'
+import CreateAccount from './CreateAccount'
 import { useAlert } from '../../Context/alert.context'
 import { useNavigate } from 'react-router-dom'
-import Loadingbar from '../Loadingbar'
-const CreateAccount =lazy(()=>import('./CreateAccount'))
 
 const Signup = () => {
     const { SignUpWithGoogle } = useAuth()
@@ -41,7 +40,7 @@ const Signup = () => {
                 </>
             }
             {
-                isCreateAccount && <Suspense fallback={<Loadingbar/>}><CreateAccount setIsCreateAccount={setIsCreateAccount} /></Suspense>
+                isCreateAccount && <CreateAccount setIsCreateAccount={setIsCreateAccount} />
             }
 
         </div>

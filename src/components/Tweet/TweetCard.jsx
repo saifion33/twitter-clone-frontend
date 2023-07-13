@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { Suspense, lazy, useState } from 'react'
+import React, { useState } from 'react'
 import TimeAgo from 'react-timeago'
 
 import imagePlaceholder from '../../assets/image-placeholder.svg'
@@ -11,14 +11,13 @@ import { BsThreeDots } from 'react-icons/bs'
 import { GoVerified } from 'react-icons/go'
 import { IoIosShareAlt } from 'react-icons/io'
 import { useModal } from '../../utils/customHooks'
+import ReplyModal from './ReplyModal'
 import { useNavigate } from 'react-router-dom'
 import SmallModal from '../Modal/SmallModal'
 import { MdDelete } from 'react-icons/md'
 import { useAuth } from '../../Context/auth.context'
 import { useAlert } from '../../Context/alert.context'
 import { LIKE_TWEET } from '../../utils/helpers'
-import Loadingbar from '../Loadingbar'
-const ReplyModal=lazy(()=>import('./ReplyModal'))
 
 const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
@@ -145,7 +144,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
                     </div>
                 </SmallModal>
             </div>
-            {isReplyModalOpen && <Suspense fallback={<Loadingbar/>} ><ReplyModal isOpen={isReplyModalOpen} isTweetOpen={isTweetOpen} isReply={tweet.isReply} setReplies={setReplies} closeModal={closeReplyModal} tweet={tweet} /></Suspense>}
+            {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} isTweetOpen={isTweetOpen} isReply={tweet.isReply} setReplies={setReplies} closeModal={closeReplyModal} tweet={tweet} />}
         </>
     )
 }

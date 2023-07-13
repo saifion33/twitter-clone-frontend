@@ -1,17 +1,17 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState,lazy,Suspense } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BiArrowBack } from 'react-icons/bi'
 import { FaUser } from 'react-icons/fa'
 import { MdOutlineCalendarMonth } from 'react-icons/md'
 import { useModal } from '../../utils/customHooks'
 import Modal from '../Modal/Modal'
-
+import ProfileEditor from '../ProfileEditor'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../Context/auth.context'
 import { useAlert } from '../../Context/alert.context'
 import {  GET_USER_BY_ID } from '../../utils/helpers'
 import Loadingbar from '../Loadingbar'
-const ProfileEditor=lazy(()=>import('../ProfileEditor'))
+
 const Profile = () => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -19,7 +19,6 @@ const Profile = () => {
   const { userId } = useParams()
   const { loggedInUser } = useAuth()
   const { showAlert } = useAlert()
-
   const getUser = (userId) => {
     setLoading(true)
     GET_USER_BY_ID(userId)
@@ -52,7 +51,7 @@ const Profile = () => {
       {
         (user && !loading) && <div>
           <div className='flex items-center gap-8 p-2'>
-            <BiArrowBack onClick={()=>navigate('/')} className='text-xl cursor-pointer'  />
+            <BiArrowBack className='text-xl' />
             <div>
               <p className='text-lg font-semibold'>{user?.name}</p>
               <p className='text-sm'>2 Tweets</p>
@@ -92,13 +91,9 @@ const Profile = () => {
               <p onClick={() => showAlert('Comming Soon 😊')} className='cursor-pointer hover:underline'><span className='text-black'>{0}</span> follower</p>
             </div>
           </div>
-          {
-            isOpen && <Modal isOpen={isOpen} onClose={closeModal} >
-           <Suspense fallback={<Loadingbar/>} >
-           <ProfileEditor />
-           </Suspense>
+          <Modal isOpen={isOpen} onClose={closeModal} >
+            <ProfileEditor />
           </Modal>
-          }
         </div>
       }
       {
