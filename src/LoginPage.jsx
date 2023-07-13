@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import Modal from './components/Modal/Modal'
 import { useNavigate } from 'react-router-dom'
-import Login from './components/Login/Login'
 import { useAuth } from './Context/auth.context'
+import Loadingbar from './components/Loadingbar'
+
+const Login = lazy(() => import('./components/Login/Login'))
 
 const LoginPage = () => {
     const navigate = useNavigate()
@@ -15,7 +17,9 @@ const LoginPage = () => {
     }
     return (
         <Modal isOpen={true} onClose={handleClose}  >
-            <Login />
+            <Suspense fallback={<Loadingbar/>}>
+                <Login />
+            </Suspense>
         </Modal>
     )
 }

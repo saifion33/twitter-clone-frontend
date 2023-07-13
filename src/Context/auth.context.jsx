@@ -18,17 +18,19 @@ const AuthContext = ({ children }) => {
 
 
     const signUp = async (googleResponse) => {
-        const data= JSON.stringify({
-            id: googleResponse.user.uid,
+        
+        const data= {
+            userName: googleResponse.user.email.split('@')[0],
+            avatarUrl: googleResponse.user.photoUrl,
             name: googleResponse.user.displayName,
             email: googleResponse.user.email,
-            userName: googleResponse.user.email.split('@')[0],
-            avatarUrl: googleResponse.user.photoUrl
-        })
+            id: googleResponse.user.uid
+        }
+       
         // CALL SIGNUP API
         SIGN_UP(data)
         .then(response=>{
-            const {token,user}=response.data
+            const {token,user}=response.data.data
             localStorage.setItem('token', JSON.stringify(token))
                     setLoggedInUser(prev => {
                         const newState = { ...prev, user, loading: false }
@@ -117,6 +119,8 @@ const AuthContext = ({ children }) => {
 
     // ********************************** SIGN UP WITH EMAIL AND PASSWORD *************************************************************
     const SignUpWithEmailAndPassword = async (name, email, password) => {
+        const isUserExist=IS_USER_EXIST(email)
+       if (isUserExist.data) {
         CreateAccount(email, password).then((googleResponse) => {
             googleResponse.user.displayName=name;
             signUp(googleResponse)
@@ -124,35 +128,47 @@ const AuthContext = ({ children }) => {
             console.log(err);
             showAlert('Signup Failed. ' + err.message, 'danger')
         })
+       }
+       else{
+        showAlert('Account already exist with this email try login','info',4000)
+        navigate('/login')
+       }
     }
 
     const signInWithEmailAndPassword = async (email, password) => {
-        const googleResponse = await signInWithEmail(email, password)
-        if (!googleResponse) {
-            return showAlert(`Signin Failed. May you don't have an account`, 'danger')
+        try {
+            const googleResponse = await signInWithEmail(email, password)
+            
+            if (!googleResponse) {
+                return showAlert(`May you don't have an account or invalid creds`, 'danger')
+            }
+            login(googleResponse.user.email, googleResponse.user.uid)
+                .then(response => {
+                    localStorage.setItem('token', JSON.stringify(response.data.token))
+                    setLoggedInUser(prev => {
+                        const newState = { ...prev, user: response.data.user, loading: false }
+                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                        return newState
+                    })
+                    navigate('/')
+                    showAlert('SignIn Successfully .', 'success')
+                })
+                .catch((error) => {
+    
+                    setLoggedInUser(prev => {
+                        const newState = { ...prev, error, loading: false }
+                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                        return newState
+                    })
+                    console.log(error)
+                    showAlert('SignIn Failed .' + error.message, 'danger')
+                })
+    
+        } catch (error) {
+            console.log(error)
         }
-        login(googleResponse.user.email, googleResponse.user.uid)
-            .then(response => {
-                localStorage.setItem('token', JSON.stringify(response.data.token))
-                setLoggedInUser(prev => {
-                    const newState = { ...prev, user: response.data.user, loading: false }
-                    localStorage.setItem('loggedInUser', JSON.stringify(newState))
-                    return newState
-                })
-                navigate('/')
-                showAlert('SignIn Successfully .', 'success')
-            })
-            .catch((error) => {
-
-                setLoggedInUser(prev => {
-                    const newState = { ...prev, error, loading: false }
-                    localStorage.setItem('loggedInUser', JSON.stringify(newState))
-                    return newState
-                })
-                console.log(error)
-                showAlert('SignIn Failed .' + error.message, 'danger')
-            })
-
+        
+     
     }
 
     return (

@@ -9,7 +9,7 @@ import { AiFillCloseCircle } from 'react-icons/ai'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { storage } from '../firebase/firebase'
 import Loadingbar from './Loadingbar'
-import { UPDATE_USER } from '../utils/helpers'
+import { UPDATE_USER, getImageBlob } from '../utils/helpers'
 import { useAlert } from '../Context/alert.context'
 
 const ProfileEditor = () => {
@@ -26,20 +26,7 @@ const ProfileEditor = () => {
   const handleBannerSelect = (e) => {
     setSelectedBanner(e.target.files[0])
   }
-  const getImageBlob = async (editorRef) => {
-    return new Promise((resolve, reject) => {
-      const canvas = editorRef.current.getImageScaledToCanvas()
-      canvas.toBlob(blob => {
-        if (blob) {
-          resolve(blob)
-        }
-        else {
-          reject(new Error('cant process file'));
-        }
-      })
-    })
-
-  }
+  
   const handleSubmit = async (values) => {
 
     const update = {}
@@ -53,6 +40,7 @@ const ProfileEditor = () => {
         const bannerUrl = await getDownloadURL(file.ref)
         update.bannerUrl = bannerUrl
       }
+      
       if (avatarImage) {
         const file = await uploadFile(ref(storage, `Users/${loggedInUser.user.id}/avatar/avatarImage`), avatarImage)
         const avatarUrl = await getDownloadURL(file.ref)
