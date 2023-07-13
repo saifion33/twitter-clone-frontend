@@ -61,3 +61,18 @@ export const GET_USER_BY_ID = userId => api.get(`/user/userByID/${userId}`)
 
 // UPDATE USER FUNCTION
 export const UPDATE_USER=(email,updates)=>api.patch(`/user/updateuser/${email}`,{updates})
+
+export const getImageBlob = async (editorRef) => {
+  return new Promise((resolve, reject) => {
+    const canvas = editorRef.current.getImageScaledToCanvas()
+    canvas.toBlob(blob => {
+      if (blob) {
+        resolve(blob)
+      }
+      else {
+        reject(new Error('cant process file'));
+      }
+    })
+  })
+
+}
