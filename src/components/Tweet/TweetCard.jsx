@@ -21,25 +21,25 @@ import { LIKE_TWEET } from '../../utils/helpers'
 import { useSignOut } from 'react-firebase-hooks/auth'
 import { auth } from '../../firebase/firebase'
 
-const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
+const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen, disableOption }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
-    const { loggedInUser ,setLoggedInUser} = useAuth()
+    const { loggedInUser, setLoggedInUser } = useAuth()
     const { showAlert } = useAlert()
     const navigate = useNavigate()
     const { isOpen: isReplyModalOpen, openModal: openReplyModal, closeModal: closeReplyModal } = useModal()
     const { isOpen: isOptionOpen, openModal: openOptionModal, closeModal: closeOptionModal } = useModal()
     const isAdmin = loggedInUser.user && tweet.user.id === loggedInUser.user.id
     const [animateClass, setAnimateClass] = useState('')
-    const [signOut]=useSignOut(auth) 
-    
+    const [signOut] = useSignOut(auth)
 
-    const handleExpireToken=()=>{
+
+    const handleExpireToken = () => {
         signOut().then(() => {
-          localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
-          setLoggedInUser({ user: null, loading: false, error: null })
-          navigate('/login')
-      })
-      }
+            localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+            setLoggedInUser({ user: null, loading: false, error: null })
+            navigate('/login')
+        })
+    }
 
     const handleImageError = () => {
         setImageLoaded(false)
@@ -53,7 +53,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
             showAlert('Please check your Internet connection.')
             return
         }
-        
+
         deleteTweet(tweet)
     }
     const userId = loggedInUser.user && loggedInUser.user.id
@@ -80,10 +80,10 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         else {
             tweet.likes.push(userId)
         }
-        LIKE_TWEET(tweet).catch(err => { 
-            if (err.response.status===401) {
+        LIKE_TWEET(tweet).catch(err => {
+            if (err.response.status === 401) {
                 handleExpireToken()
-            }         
+            }
             console.log(err.message)
             if (!isLiked) {
                 const newLikes = tweet.likes.filter(id => id != userId)
@@ -102,7 +102,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
 
     return (
         <>
-            <div className='p-6 cursor-pointer hover:bg-gray-100 relative '>
+            <div className={`p-6 cursor-pointer hover:bg-gray-100 ${disableOption?'bg-gray-100':''}  relative `}>
                 <div onClick={openTweet}>
                     <header className='flex gap-4 items-center'>
                         <div onClick={openProfile} >
@@ -115,9 +115,11 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
                             <p onClick={openProfile} className='text-gray-700 hover:underline '>@{tweet.user.userName}</p>
                             <TimeAgo className='text-gray-700 ml-3' date={tweet.postedOn} />
                         </div>
-                        <div onClick={(e) => { e.stopPropagation(); openOptionModal() }} className='ml-auto mr-5 cursor-pointer p-2 rounded-full hover:bg-twitter-25 bg-opacity-10 hover:text-twitter-100 transition-colors duration-300 text-xl'>
-                            <BsThreeDots />
-                        </div>
+                        {
+                            !disableOption && <div onClick={(e) => { e.stopPropagation(); openOptionModal() }} className='ml-auto mr-5 cursor-pointer p-2 rounded-full hover:bg-twitter-25 bg-opacity-10 hover:text-twitter-100 transition-colors duration-300 text-xl'>
+                                <BsThreeDots />
+                            </div>
+                        }
                     </header>
                     <div className='pl-12 py-4'>{tweet.tweet}</div>
                     <div className='flex justify-center items-center'>
@@ -132,10 +134,12 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
                     </div>
                 </div>
                 <footer className='p-5 px-8 flex gap-6'>
-                    <div onClick={openReplyModal} className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>
-                        <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><BiMessageRounded /></div>
-                        <span className='text-sm '>{tweet.replyCount}</span>
-                    </div>
+                   {
+                    !disableOption &&  <div onClick={openReplyModal} className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>
+                    <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><BiMessageRounded /></div>
+                    <span className='text-sm '>{tweet.replyCount}</span>
+                </div>
+                   }
                     <div onClick={() => showAlert('Comming soon. 😊')} className='flex gap-2 items-center text-gray-700 group hover:text-green-600 cursor-pointer w-fit transition-all duration-300 '>
                         <div className='text-lg  group-hover:bg-green-200  rounded-full p-1'><AiOutlineRetweet /></div>
                         <span className='text-sm'></span>
