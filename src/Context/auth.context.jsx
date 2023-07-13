@@ -18,7 +18,7 @@ const AuthContext = ({ children }) => {
 
 
     const signUp = async (googleResponse) => {
-        const data= JSON.stringify({
+        const data = JSON.stringify({
             id: googleResponse.user.uid,
             name: googleResponse.user.displayName,
             email: googleResponse.user.email,
@@ -27,30 +27,34 @@ const AuthContext = ({ children }) => {
         })
         // CALL SIGNUP API
         SIGN_UP(data)
-        .then(response=>{
-            const {token,user}=response.data
-            localStorage.setItem('token', JSON.stringify(token))
-                    setLoggedInUser(prev => {
-                        const newState = { ...prev, user, loading: false }
-                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
-                        return newState
-                    });
-                    navigate('/')
-                    showAlert('Signup successfully .', 'success')
-        })
-        .catch(err => {
-                    console.log(err);
-                    setLoggedInUser(prev => {
-                        const newState = { ...prev, error: err.message }
-                        localStorage.setItem('loggedInUser', JSON.stringify(newState))
-                        return newState
-                    });
-                    showAlert(`Signup Failed ${err.message}`, 'danger')
-                })
+            .then(response => {
+                const { token, user } = response.data
+                localStorage.setItem('token', JSON.stringify(token))
+                setLoggedInUser(prev => {
+                    const newState = { ...prev, user, loading: false }
+                    localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                    return newState
+                });
+                navigate('/')
+                showAlert('Signup successfully .', 'success')
+            })
+            .catch(err => {
+                console.log(err);
+                setLoggedInUser(prev => {
+                    const newState = { ...prev, error: err.message }
+                    localStorage.setItem('loggedInUser', JSON.stringify(newState))
+                    return newState
+                });
+                showAlert(`Signup Failed ${err.message}`, 'danger')
+            })
     }
 
     // ** SIGN UP WITH GOOGLE
     const SignUpWithGoogle = async () => {
+        if (!navigator.onLine) {
+            showAlert('check your Internet connection')
+            return
+        }
         setLoggedInUser({ ...loggedInUser, loading: true })
         // SEND SIGNUP REQUEST TO GOOGLE
         signInGoogle()
@@ -64,8 +68,8 @@ const AuthContext = ({ children }) => {
     }
     const login = async (email, id) => {
         try {
-            const response=await LOGIN(email,id)
-            const {data}=response.data;
+            const response = await LOGIN(email, id)
+            const { data } = response.data;
             return { data, status: response.status }
         } catch (error) {
             console.log(error)
@@ -75,6 +79,10 @@ const AuthContext = ({ children }) => {
 
     // ** SIGN IN WITH GOOGLE
     const SignInWithGoogle = async () => {
+        if (!navigator.onLine) {
+            showAlert('check your Internet connection')
+            return
+        }
         setLoggedInUser({ ...loggedInUser, loading: true })
         signInGoogle()
             .then(async (googleResponse) => {
@@ -117,8 +125,12 @@ const AuthContext = ({ children }) => {
 
     // ********************************** SIGN UP WITH EMAIL AND PASSWORD *************************************************************
     const SignUpWithEmailAndPassword = async (name, email, password) => {
+        if (!navigator.onLine) {
+            showAlert('Check your Internet connection')
+            return
+        }
         CreateAccount(email, password).then((googleResponse) => {
-            googleResponse.user.displayName=name;
+            googleResponse.user.displayName = name;
             signUp(googleResponse)
         }).catch(err => {
             console.log(err);

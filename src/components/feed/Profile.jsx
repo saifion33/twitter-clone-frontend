@@ -28,6 +28,7 @@ const Profile = () => {
     })
     .catch(err=>{
       console.log(err.message)
+      console.log(err)
     })
     .finally(()=>setLoading(false))
     

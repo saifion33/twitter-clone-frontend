@@ -10,9 +10,11 @@ import { getDownloadURL, ref } from 'firebase/storage'
 import { useAuth } from '../../Context/auth.context'
 import { useNavigate } from 'react-router-dom'
 import { REPLY_TWEET } from '../../utils/helpers'
+import { useSignOut } from 'react-firebase-hooks/auth'
 
 const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
-    const { loggedInUser } = useAuth()
+    const { loggedInUser,setLoggedInUser } = useAuth()
+    const [signOut]=useSignOut(auth)
     const navigate = useNavigate()
     useEffect(() => {
         if (!loggedInUser.user) {
@@ -21,6 +23,15 @@ const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
         }
     }, [])
     const [uploadImage] = useUploadFile(auth)
+
+    const handleExpireToken=()=>{
+        signOut().then(() => {
+          localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+          setLoggedInUser({ user: null, loading: false, error: null })
+          navigate('/login')
+      })
+      }
+
     const handleImageUpload = async (image) => {
         try {
             const result = await uploadImage(ref(storage, `/images/${loggedInUser.user.id}/${Date.now() + image.name}`), image, { cacheControl: `public , max-age=${3600 * 24 * 3}` });
@@ -34,6 +45,7 @@ const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
 
 
     const handleReply = async (replyTweet, imageUrl, user) => {
+
             REPLY_TWEET({replyTweet,imageUrl,user},tweet)
             .then((response)=>{
                 const newReply=response.data.data
@@ -47,7 +59,11 @@ const ReplyModal = ({ isOpen, closeModal, tweet, setReplies, isTweetOpen }) => {
                 closeModal()
             })
             .catch(err=>{
-                console.log(err.message)
+                if (err.response.status===401) {
+                    handleExpireToken()
+                    return
+                }
+                console.log(err)
                 closeModal()
             })
     }

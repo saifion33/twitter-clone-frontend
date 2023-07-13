@@ -18,16 +18,29 @@ import { MdDelete } from 'react-icons/md'
 import { useAuth } from '../../Context/auth.context'
 import { useAlert } from '../../Context/alert.context'
 import { LIKE_TWEET } from '../../utils/helpers'
+import { useSignOut } from 'react-firebase-hooks/auth'
+import { auth } from '../../firebase/firebase'
 
 const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
     const [imageLoaded, setImageLoaded] = useState(true)
-    const { loggedInUser } = useAuth()
+    const { loggedInUser ,setLoggedInUser} = useAuth()
     const { showAlert } = useAlert()
     const navigate = useNavigate()
     const { isOpen: isReplyModalOpen, openModal: openReplyModal, closeModal: closeReplyModal } = useModal()
     const { isOpen: isOptionOpen, openModal: openOptionModal, closeModal: closeOptionModal } = useModal()
     const isAdmin = loggedInUser.user && tweet.user.id === loggedInUser.user.id
     const [animateClass, setAnimateClass] = useState('')
+    const [signOut]=useSignOut(auth) 
+    
+
+    const handleExpireToken=()=>{
+        signOut().then(() => {
+          localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+          setLoggedInUser({ user: null, loading: false, error: null })
+          navigate('/login')
+      })
+      }
+
     const handleImageError = () => {
         setImageLoaded(false)
 
@@ -67,7 +80,10 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen }) => {
         else {
             tweet.likes.push(userId)
         }
-        LIKE_TWEET(tweet).catch(err => {            
+        LIKE_TWEET(tweet).catch(err => { 
+            if (err.response.status===401) {
+                handleExpireToken()
+            }         
             console.log(err.message)
             if (!isLiked) {
                 const newLikes = tweet.likes.filter(id => id != userId)

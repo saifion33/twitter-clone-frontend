@@ -11,6 +11,8 @@ import { storage } from '../firebase/firebase'
 import Loadingbar from './Loadingbar'
 import { UPDATE_USER } from '../utils/helpers'
 import { useAlert } from '../Context/alert.context'
+import { useSignOut } from 'react-firebase-hooks/auth'
+import { useNavigate } from 'react-router-dom'
 
 const ProfileEditor = () => {
   const { loggedInUser, setLoggedInUser } = useAuth();
@@ -22,10 +24,20 @@ const ProfileEditor = () => {
   const [isUpdating, setIsUpdating] = useState(false)
 
   const [uploadFile] = useUploadFile();
-
+  const [signOut]=useSignOut()
+  const navigate=useNavigate()
   const handleBannerSelect = (e) => {
     setSelectedBanner(e.target.files[0])
   }
+
+  const handleExpireToken=()=>{
+    signOut().then(() => {
+      localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+      setLoggedInUser({ user: null, loading: false, error: null })
+      navigate('/login')
+  })
+  }
+
   const getImageBlob = async (editorRef) => {
     return new Promise((resolve, reject) => {
       const canvas = editorRef.current.getImageScaledToCanvas()
@@ -45,6 +57,7 @@ const ProfileEditor = () => {
     const update = {}
     const bannerImage = selectedBanner ? await getImageBlob(bannerRef) : null;
     const avatarImage = slectedAvatar ? await getImageBlob(avatarRef) : null;
+
 
     try {
       setIsUpdating(true)
@@ -85,13 +98,18 @@ const ProfileEditor = () => {
       .catch(err=>{
         if (err.response.status==409) {
           showAlert('UserName Already Exists.','danger')
+          return
+        }
+        if (err.response.status===401) {
+          handleExpireToken()
+          return
         }
         showAlert('Something went wrong','danger')
         console.log(err.message)
       })
       .finally(()=>setIsUpdating(false))
     } catch (error) {
-      showAlert(`Error: ${error.message}`,'danger')
+      showAlert('Something went wrong '+error.message,'danger')
       console.log(error)
     }
 

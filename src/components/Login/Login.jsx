@@ -29,6 +29,10 @@ const Login = () => {
     const Formik = useFormik({
         initialValues: { email: '', password: '' }, validate, onSubmit: async (values) => {
             try {
+                if (!navigator.onLine) {
+                    showAlert('Check your Internet connection')
+                    return
+                }
                 setLoading(true)
                 signInWithEmailAndPassword(values.email, values.password).finally(() => setLoading(false))
             } catch (error) {
@@ -39,6 +43,10 @@ const Login = () => {
     })
     const handleSignInWithGoogle = async () => {
         try {
+            if (!navigator.onLine) {
+                showAlert('Check your Internet connection')
+                return
+            }
             setLoading(true)
             SignInWithGoogle()
         } catch (error) {

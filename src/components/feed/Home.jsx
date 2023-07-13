@@ -11,14 +11,25 @@ import { useAlert } from '../../Context/alert.context'
 import { useNavigate } from 'react-router-dom'
 import { DELETE_TWEET, POST_TWEET } from '../../utils/helpers'
 import { BiWifiOff } from 'react-icons/bi'
+import { useAuth } from '../../Context/auth.context'
+
 
 const Home = () => {
   const [user, userLoading] = useAuthState(auth)
+  const {setLoggedInUser}=useAuth()
   const [signOut] = useSignOut(auth)
   const [uploadImage] = useUploadFile(auth)
   const { showAlert } = useAlert()
   const { tweets, setTweets,tweetsLoading } = useTweets()
   const navigate = useNavigate()
+  
+  const handleExpireToken=()=>{
+    signOut().then(() => {
+      localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+      setLoggedInUser({ user: null, loading: false, error: null })
+      navigate('/login')
+  })
+  }
 
 
   // Upload image to firebase storage
@@ -46,8 +57,8 @@ const Home = () => {
     .catch(err => {
       console.log(err.message)
       if (err.response.status==401) {
-        signOut()
-        navigate('/login')
+        handleExpireToken()
+        return
       }
     })
     
@@ -75,8 +86,8 @@ const Home = () => {
       console.log(err)
       showAlert('There was an error', 'danger')
       if(err.response.status==401){
-        signOut()
-        navigate('/login')
+       handleExpireToken()
+      return
       }
     })
     

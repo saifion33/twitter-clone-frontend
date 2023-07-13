@@ -69,6 +69,9 @@ const Sidebar = () => {
         .catch(err=>{
             if (err.response.status == 401) {
                 signOut().then(() => {
+                    localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+                    setLoggedInUser({ user: null, loading: false, error: null })
+                    closeModal()
                     navigate('/login')
                 })
             }
