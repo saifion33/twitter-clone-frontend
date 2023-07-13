@@ -72,7 +72,7 @@ const ProfileEditor = () => {
         update.location = values.location
       }
       
-      UPDATE_USER(loggedInUser.user.email,update)
+      UPDATE_USER(loggedInUser.user.email)
       .then(res=>{
         const user=res.data.data
         setLoggedInUser(prev => {
@@ -86,8 +86,6 @@ const ProfileEditor = () => {
         if (err.response.status==409) {
           showAlert('UserName Already Exists.','danger')
         }
-        showAlert('Something went wrong','danger')
-        console.log(err.message)
       })
       .finally(()=>setIsUpdating(false))
     } catch (error) {
