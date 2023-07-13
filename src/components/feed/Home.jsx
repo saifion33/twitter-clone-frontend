@@ -47,11 +47,11 @@ const Home = () => {
     })
     .catch(err => {
       if (err.response.status===401) {
-        signOut().then(()=>{
+        signOut().then(() => {
+          localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
+          setLoggedInUser({ user: null, loading: false, error: null })
           navigate('/login')
-          setLoggedInUser({user:null,loading:false,error:null})
-        
-        })
+      })
         return
       }
       console.log(err)
@@ -80,11 +80,11 @@ const Home = () => {
     })
     .catch(err=>{
       if (err.response.status===401) {
-        signOut().then(()=>{
-          navigate('/login')
-          setLoggedInUser({ user: null, loading: false, error: null })
+        signOut().then(() => {
           localStorage.setItem('loggedInUser', JSON.stringify({ user: null, loading: false, error: null }))
-        })
+          setLoggedInUser({ user: null, loading: false, error: null })
+          navigate('/login')
+      })
         return
       }
       console.log(err)
