@@ -11,11 +11,16 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
+
     const METHODS = ['post', 'patch', 'delete']
-    if (METHODS.includes(config.method)) {
+    const addToken = () => {
         const token = JSON.parse(localStorage.getItem('token'))
         config.headers.Authorization += ` ${token}`
     }
+    if (METHODS.includes(config.method) && config.url!=='/auth/signup') {
+        addToken()
+    }
+    
     return config
 })
 

@@ -52,10 +52,10 @@ const Profile = () => {
       {
         (user && !loading) && <div>
           <div className='flex items-center gap-8 p-2'>
-            <BiArrowBack className='text-xl' />
+            <BiArrowBack onClick={()=>navigate('/')} className='text-xl cursor-pointer' />
             <div>
               <p className='text-lg font-semibold'>{user?.name}</p>
-              <p className='text-sm'>2 Tweets</p>
+              
             </div>
           </div>
           <div className='relative'>

@@ -28,7 +28,7 @@ const AuthContext = ({ children }) => {
         // CALL SIGNUP API
         SIGN_UP(data)
             .then(response => {
-                const { token, user } = response.data
+                const { token, user } = response.data.data
                 localStorage.setItem('token', JSON.stringify(token))
                 setLoggedInUser(prev => {
                     const newState = { ...prev, user, loading: false }
@@ -129,6 +129,8 @@ const AuthContext = ({ children }) => {
             showAlert('Check your Internet connection')
             return
         }
+        const isAccountExist=await IS_USER_EXIST(email)
+       if(!isAccountExist.data){
         CreateAccount(email, password).then((googleResponse) => {
             googleResponse.user.displayName = name;
             signUp(googleResponse)
@@ -136,9 +138,15 @@ const AuthContext = ({ children }) => {
             console.log(err);
             showAlert('Signup Failed. ' + err.message, 'danger')
         })
+        return
+       }
+        showAlert('Account already exist with this email')
+       
+       
     }
 
     const signInWithEmailAndPassword = async (email, password) => {
+
         const googleResponse = await signInWithEmail(email, password)
         if (!googleResponse) {
             return showAlert(`Signin Failed. May you don't have an account`, 'danger')
