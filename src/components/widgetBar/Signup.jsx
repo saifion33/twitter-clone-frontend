@@ -11,7 +11,7 @@ const Signup = () => {
     const { showAlert } = useAlert()
     const navigate = useNavigate()
     return (
-        <div>
+        <div className='w-[80%]'>
             <div className='border-[1px] rounded-xl p-4'>
                 <div>
                     <h1 className='font-bold text-2xl my-2'>New to Twitter?</h1>

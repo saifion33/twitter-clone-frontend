@@ -46,9 +46,10 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen, disableOption 
 
     }
     const openTweet = async () => {
-        navigate(`/tweet/${tweet._id}`, { relative: 'path' })
+        navigate(`/tweet/${tweet._id}/${tweet.replyOf?tweet.replyOf:''}`, { relative: 'path' })
     }
-    const handleDeleteTweet = () => {
+    const handleDeleteTweet = (e) => {
+        e.stopPropagation()
         if (!navigator.onLine) {
             showAlert('Please check your Internet connection.')
             return
@@ -59,7 +60,8 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen, disableOption 
     const userId = loggedInUser.user && loggedInUser.user.id
     const isLiked = tweet.likes.includes(userId)
 
-    const handleLikeTweet = () => {
+    const handleLikeTweet = (e) => {
+        e.stopPropagation()
         if (!navigator.onLine) {
             showAlert('Please check your Internet connection.')
             return
@@ -99,47 +101,57 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen, disableOption 
         e.stopPropagation();
         navigate(`/profile/${tweet.user.id}`)
     }
+    const handleReply = (e) => {
+        e.stopPropagation()
+        openReplyModal()
+    }
+    const handleShareTweet=(e) => {
+        e.stopPropagation()
+        copy(`${location.host}/tweet/${tweet._id}`)
+        showAlert('Tweet Link Copied to clipboard')
+    }
+
 
     return (
         <>
-            <div className={`p-6 cursor-pointer hover:bg-gray-100 ${disableOption?'bg-gray-100':''}  relative `}>
-                <div onClick={openTweet}>
-                    <header className='flex gap-4 items-center'>
-                        <div onClick={openProfile} >
-                            <img className='rounded-full w-12' src={tweet.user.avatarUrl} alt={tweet.user.name} />
-                        </div>
+            <div onClick={openTweet} role='card' className={`p-6 cursor-pointer hover:bg-gray-100 ${disableOption ? 'bg-gray-100' : ''}  relative `}>
 
-                        <div className='flex items-center gap-1 cursor-pointer'>
-                            <h1 onClick={openProfile} className='text-lg font-semibold hover:underline '>{tweet.user.name}</h1>
-                            <GoVerified className='text-twitter-100  ' />
-                            <p onClick={openProfile} className='text-gray-700 hover:underline '>@{tweet.user.userName}</p>
-                            <TimeAgo className='text-gray-700 ml-3' date={tweet.postedOn} />
-                        </div>
-                        {
-                            !disableOption && <div onClick={(e) => { e.stopPropagation(); openOptionModal() }} className='ml-auto mr-5 cursor-pointer p-2 rounded-full hover:bg-twitter-25 bg-opacity-10 hover:text-twitter-100 transition-colors duration-300 text-xl'>
-                                <BsThreeDots />
-                            </div>
-                        }
-                    </header>
-                    <div className='pl-12 py-4'>{tweet.tweet}</div>
-                    <div className='flex justify-center items-center'>
-                        {
-                            tweet.imageUrl && <div>{
-                                imageLoaded ? (
-                                    <img src={tweet.imageUrl} onError={handleImageError} alt="Image" />
-                                ) : (
-                                    <img src={imagePlaceholder} alt="Placeholder image" />
-                                )}</div>
-                        }
+                <header className='flex gap-4 items-center'>
+                    <div onClick={openProfile} >
+                        <img className='rounded-full w-12' src={tweet.user.avatarUrl} alt={tweet.user.name} />
                     </div>
+
+                    <div className='flex items-center gap-1 cursor-pointer'>
+                        <h1 onClick={openProfile} className='text-lg font-semibold hover:underline '>{tweet.user.name}</h1>
+                        <GoVerified className='text-twitter-100  ' />
+                        <p onClick={openProfile} className='text-gray-700 hover:underline '>@{tweet.user.userName}</p>
+                        <TimeAgo className='text-gray-700 ml-3' date={tweet.postedOn} />
+                    </div>
+                    {
+                        !disableOption && <div onClick={(e) => { e.stopPropagation(); openOptionModal() }} className='ml-auto mr-5 cursor-pointer p-2 rounded-full hover:bg-twitter-25 bg-opacity-10 hover:text-twitter-100 transition-colors duration-300 text-xl'>
+                            <BsThreeDots />
+                        </div>
+                    }
+                </header>
+                <div className='pl-12 py-4'>{tweet.tweet}</div>
+                <div className='flex justify-center items-center'>
+                    {
+                        tweet.imageUrl && <div>{
+                            imageLoaded ? (
+                                <img src={tweet.imageUrl} onError={handleImageError} alt="Image" />
+                            ) : (
+                                <img src={imagePlaceholder} alt="Placeholder image" />
+                            )}</div>
+                    }
                 </div>
+
                 <footer className='p-5 px-8 flex gap-6'>
-                   {
-                    !disableOption &&  <div onClick={openReplyModal} className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>
-                    <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><BiMessageRounded /></div>
-                    <span className='text-sm '>{tweet.replyCount}</span>
-                </div>
-                   }
+                    {
+                        !disableOption && <div onClick={handleReply} className='flex gap-2 items-center text-gray-700 group hover:text-twitter-100 cursor-pointer w-fit transition-all duration-300 '>
+                            <div className='text-lg  group-hover:bg-twitter-25 rounded-full p-1'><BiMessageRounded /></div>
+                            <span className='text-sm '>{tweet.replyCount}</span>
+                        </div>
+                    }
                     <div onClick={() => showAlert('Comming soon. 😊')} className='flex gap-2 items-center text-gray-700 group hover:text-green-600 cursor-pointer w-fit transition-all duration-300 '>
                         <div className='text-lg  group-hover:bg-green-200  rounded-full p-1'><AiOutlineRetweet /></div>
                         <span className='text-sm'></span>
@@ -160,7 +172,7 @@ const TweetCard = ({ tweet, deleteTweet, setReplies, isTweetOpen, disableOption 
                 <SmallModal position={'right-2'} isOpen={isOptionOpen} onClose={closeOptionModal} >
                     <div className='py-2 space-y-3 '>
                         {isAdmin && <div onClick={handleDeleteTweet} className='hover:bg-gray-200 px-2 rounded flex gap-2 items-center text-red-600'><MdDelete /> Delete Tweet</div>}
-                        <div onClick={() => copy(`${location.host}/tweet/${tweet._id}`)} className='hover:bg-gray-200 px-2 rounded flex gap-2 items-center text-twitter-100'><IoIosShareAlt /> Share Tweet</div>
+                        <div onClick={handleShareTweet} className='hover:bg-gray-200 px-2 rounded flex gap-2 items-center text-twitter-100'><IoIosShareAlt /> Share Tweet</div>
                     </div>
                 </SmallModal>
             </div>

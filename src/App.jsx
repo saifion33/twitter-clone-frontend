@@ -40,7 +40,7 @@ function App() {
             <Route path='/profile/:userId' element={<Profile />} />
             <Route path='/lists' element={<Lists />} />
             <Route path='/more' element={<More />} />
-            <Route path='/tweet/:id' element={<Tweet />} />
+            <Route path='/tweet/:id/:replyOf?' element={<Tweet />} />
             <Route path='/' element={<Home />} />
           </Route>
           <Route path='/login' element={<LoginPage />} />

@@ -58,7 +58,7 @@ export const DELETE_TWEET = (tweetId) => api.delete(`/tweet/delete/${tweetId}`)
 export const DELETE_REPLY = (tweetId, replyId) => api.delete(`/tweet/delete/reply/${tweetId}/${replyId}`)
 
 // GET TWEET BY ID FUNCTION
-export const GET_TWEET_BY_ID = (tweetId) => api.get(`/tweet/getTweet/${tweetId}`)
+export const GET_TWEET_BY_ID = (tweetId,replyOf) => api.get(`/tweet/getTweet/${tweetId}${replyOf?`?replyOf=${replyOf}`:''}`)
 
 // ************************************************* USER FUNCTIONS *********************************************************************
 

@@ -23,10 +23,10 @@ const Tweet = () => {
     const [tweet, setTweet] = useState(null)
     const { loggedInUser } = useAuth()
     const { showAlert } = useAlert()
-    const { id } = useParams()
+    const { id,replyOf } = useParams()
 
     const getData = () => {
-        const getTweet = GET_TWEET_BY_ID(id)
+        const getTweet = GET_TWEET_BY_ID(id,replyOf?replyOf:null)
         const getTweetReplies = GET_TWEET_REPLIES(id)
         setLoading(true)
         Promise.all([getTweet, getTweetReplies]).then(res => {
@@ -38,6 +38,7 @@ const Tweet = () => {
         })
         .catch((err)=>{
             console.log(err.message)
+            showAlert('Something went wrong','danger')
         })
         .finally(() => setLoading(false))
     }
@@ -48,6 +49,7 @@ const Tweet = () => {
             return
         }
         getData()
+        
 
     }, [id])
 
